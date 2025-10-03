@@ -61,4 +61,7 @@ public class Avaliacao {
 
     public boolean isIluminacaoNoturna() { return iluminacaoNoturna; }
     public void setIluminacaoNoturna(boolean iluminacaoNoturna) { this.iluminacaoNoturna = iluminacaoNoturna; }
+
+    public boolean isAcessibilidadePlena() { return presencaPisoTatil && rebaixamentoGuia && semObstaculos && iluminacaoNoturna; }
+
 }

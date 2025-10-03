@@ -1,5 +1,6 @@
 import java.util.Date;
 import java.util.List;
+import java.util.ArrayList; // CORREÇÃO: Importa a classe ArrayList
 
 public class Relatorio {
     private Date dataGeracaoRelatorio;
@@ -10,7 +11,9 @@ public class Relatorio {
     private List<Avaliacao> avaliacoes;   // assoc com Avaliações
 
     // Construtor vazio
-    public Relatorio() {}
+    public Relatorio() {
+        this.avaliacoes = new ArrayList<>(); // Inicialização para evitar NullPointerException
+    }
 
     // Construtor basico
     public Relatorio(Date dataGeracaoRelatorio, String area, String autor, String mediaNotas) {
@@ -18,6 +21,7 @@ public class Relatorio {
         this.area = area;
         this.autor = autor;
         this.mediaNotas = mediaNotas;
+        this.avaliacoes = new ArrayList<>(); // Boa prática
     }
 
     // getters e setters
