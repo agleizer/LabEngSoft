@@ -1,0 +1,20 @@
+LabEngSoft/
+├── .env.example
+├── .gitignore
+├── .editorconfig
+├── .gitattributes
+├── Dockerfile
+├── docker-compose.yml
+├── pom.xml
+├── README_DEV.md
+├── mvnw*                    # wrappers do Maven
+├── documentacao/ 
+├── .mvn/                    # configs do wrapper
+├── src/                     # documentação e diagramas abertos
+│   ├── main/
+│   │   ├── java/            # código-fonte Spring Boot
+│   │   └── resources/
+│   │       ├── static/      # HTML, CSS, JS, Leaflet
+│   │       └── application.properties
+│   └── test/java/
+└── .github/workflows/ci.yml

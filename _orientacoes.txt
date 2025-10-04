@@ -1,0 +1,247 @@
+Guia Completo de Desenvolvimento — *Caminho Fácil*
+
+1  Visão Geral
+
+O projeto usa três pilares:
+
+| Camada                  | Ferramenta           | Responsabilidade                                  |
+| ----------------------- | -------------------- | ------------------------------------------------- |
+| Ambiente idêntico       | Docker + Compose     | Mesmo sistema operacional, JDK 21 e PostgreSQL 17 |
+| Dependências Java       | Maven + Wrapper      | Controla bibliotecas e versão do Maven            |
+| Colaboração e histórico | Git + GitHub         | Versiona código, pipelines e documentação         |
+
+Você pode programar tanto:
+
+* Fora do contêiner (fluxo B – local com JDK/Maven); ou
+* Dentro de um contêiner *dev* (fluxo C – totalmente isolado).
+
+Todos os commits e branches são feitos fora do contêiner — o contêiner nunca versiona nada. Ele só roda e compila.
+
+2  Estrutura do Repositório
+
+
+caminho-facil/
+├── .env.example
+├── Dockerfile
+├── docker-compose.yml
+├── pom.xml
+├── mvnw*, .mvn/
+├── src/
+│   ├── main/java/...      # código Spring Boot
+│   └── main/resources/... # configs e HTML
+├── .github/workflows/ci.yml
+├── .editorconfig, .gitattributes, .gitignore
+└── README_DEV.md
+
+
+3  Fluxo de Trabalho Padrão (Time)
+
+3.1  Primeiro setup (uma vez)
+
+bash
+git clone https://github.com/<org>/<repo>.git
+cd caminho-facil
+cp .env.example .env
+docker compose up --build
+
+
+A aplicação sobe em [http://localhost:8080](http://localhost:8080).
+
+3.2  Editar código e versionar
+
+1. Editar normalmente o código no VS Code/IntelliJ/etc.
+   (a pasta `src/` está montada localmente — você nunca precisa editar dentro do contêiner).
+
+2. Testar:
+
+   bash
+   docker compose build app
+   docker compose up -d app
+   docker compose logs -f app
+   
+
+3. Versionar fora do contêiner (sempre):
+
+   bash
+   git status
+   git add src/... pom.xml
+   git commit -m "feat: nova rota /avaliacoes"
+   git push origin minha-branch
+   
+
+   > Nunca faça `git add` ou `git commit` dentro do Docker.
+   > O contêiner é efêmero: ele não guarda histórico e pode ser removido a qualquer momento.
+   > O versionamento é sempre no host.
+
+4. Abrir Pull Request no GitHub → CI executa build/testes → merge na `main` apenas com verde.
+
+3.3  Quando alterar dependências
+
+1. Editar `pom.xml` e fixar versões.
+2. Comitar:
+
+   bash
+   git add pom.xml
+   git commit -m "chore(deps): add springdoc"
+   git push
+   
+3. Rebuild:
+
+   bash
+   docker compose build app && docker compose up -d app
+   
+4. O GitHub Actions recompila e testa automaticamente.
+
+3.4  Branches e sincronia
+
+| Ação                 | Comando                                    |
+| -------------------- | ------------------------------------------ |
+| Criar branch nova    | `git checkout -b feat/nova-funcionalidade` |
+| Trocar de branch     | `git checkout main`                        |
+| Atualizar sua branch | `git pull origin main`                     |
+| Enviar alterações    | `git push origin feat/nova-funcionalidade` |
+
+---
+
+4  Fluxos de Execução
+
+# Fluxo A – Paridade total (Docker build)
+
+Mais estável, usado em integração e CI:
+
+bash
+docker compose up --build
+
+
+Recompila e roda tudo dentro da imagem. Ideal para testar “como o servidor verá o sistema”.
+
+---
+
+# Fluxo B – Desenvolvimento rápido (Maven local)
+
+Usa seu Java/Maven local, mas o banco em contêiner:
+
+bash
+docker compose up -d db
+./mvnw spring-boot:run
+
+
+Hot-reload possível com `spring-boot-devtools`.
+
+---
+
+# Fluxo C – Desenvolvimento dentro do contêiner (sem Maven local)
+
+Adicione este perfil no `docker-compose.yml`:
+
+yaml
+  dev:
+    image: maven:3.9.11-eclipse-temurin-21
+    working_dir: /workspace
+    command: bash -lc "sleep infinity"
+    volumes:
+      - ./:/workspace
+    env_file: [.env]
+    depends_on:
+      db:
+        condition: service_healthy
+    profiles: ["dev"]
+
+
+Rodar:
+
+bash
+docker compose --profile dev up -d db dev
+docker compose exec dev bash     # entra no container
+./mvnw clean package
+./mvnw spring-boot:run
+
+
+> Mesmo aqui, os arquivos estão montados da sua máquina → o `git` continua sendo usado no host.
+
+5  Comandos Essenciais
+
+| Ação                    | Comando                                                   |
+| ----------------------- | --------------------------------------------------------- |
+| Subir app + DB          | `docker compose up --build`                               |
+| Subir só DB             | `docker compose up -d db`                                 |
+| Rebuild do app          | `docker compose build app && docker compose up -d app`    |
+| Ver logs                | `docker compose logs -f app`                              |
+| Parar tudo              | `docker compose down`                                     |
+| Resetar banco           | `docker compose down -v`                                  |
+| Entrar no app (runtime) | `docker compose exec app sh`                              |
+| Acessar Postgres        | `docker compose exec db psql -U postgres -d caminhofacil` |
+
+6  Ciclo Completo de Contribuição
+
+1. Criar branch (`git checkout -b feat/...`)
+2. Codar → testar (`docker compose build app`)
+3. Commitar fora do contêiner
+4. `git push`
+5. Abrir PR
+6. CI (GitHub Actions) valida build/testes
+7. Merge
+
+7  Como o CI se integra
+
+O arquivo `.github/workflows/ci.yml`:
+
+* Roda em Ubuntu com JDK 21 e Postgres 17
+* Executa `./mvnw clean verify`
+* Marca o PR com se compilar e os testes passarem
+
+Nada é manual — cada push gera uma build automática.
+
+8  Por que não commitar dentro do contêiner
+
+| Motivo                           | Explicação                                                                                     |
+| -------------------------------- | ---------------------------------------------------------------------------------------------- |
+| Contêiner ≠ workspace            | É um ambiente efêmero. Se parar, tudo se perde.                                                |
+| Git não vê os metadados corretos | Autoria e timestamps se perdem.                                                                |
+| Configuração SSH e credenciais   | Não existem no contêiner por segurança.                                                        |
+| O volume já está montado         | Tudo que você muda dentro do contêiner aparece fora — então é inútil fazer o commit lá dentro. |
+
+Em resumo: você edita e commita fora, compila onde quiser.
+
+9  Resumo Rápido (cola de comandos)
+
+bash
+# Clonar e configurar
+git clone <repo>
+cd caminho-facil
+cp .env.example .env
+docker compose up --build
+
+# Desenvolvimento
+git checkout -b feat/minha-tarefa
+code src/main/java/...       # editar
+docker compose build app
+docker compose up -d app
+git add .
+git commit -m "feat: minha tarefa"
+git push origin feat/minha-tarefa
+
+# Testes e CI
+./mvnw test                  # local
+# ou deixar o GitHub Actions rodar
+
+# Encerrar
+docker compose down
+
+
+10  Boas Práticas Gerais
+
+* Sempre usar branches descritivas (`feat/`, `fix/`, `docs/`).
+* Cada commit deve ser atômico e legível.
+* Nunca subir senhas reais (só `.env.example`).
+* Revisar PRs antes do merge.
+* Testes devem passar local e no CI.
+* Atualizar dependências com versões fixas e commit dedicado.
+* Taggear versões de release no GitHub (`v0.1.0`, `v0.2.0`, ...).
+
+ Em resumo
+
+> Desenvolva fora do contêiner.
+> Compile dentro ou fora, conforme o fluxo.
+> Commite sempre no host.
+> Deixe o CI garantir que tudo compila igual para todos.
