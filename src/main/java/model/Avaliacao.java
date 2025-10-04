@@ -1,3 +1,5 @@
+package model;
+
 public class Avaliacao {
     private float notaGeral;
     private float notaIdoso;

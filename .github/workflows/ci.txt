@@ -1,0 +1,2 @@
+renomear ci.yml.test -> ci.yml
+quando maven estiver rodando
