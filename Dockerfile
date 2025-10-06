@@ -3,19 +3,23 @@
 
 # syntax=docker/dockerfile:1.6
 
-# --- Etapa 1: build ---
+# Etapa de build
 FROM maven:3.9.11-eclipse-temurin-21 AS build
 WORKDIR /workspace
 
-# Baixa dependências para cache
+ENV MAVEN_CONFIG=""
+
+# Copia apenas o pom.xml e o wrapper para baixar dependências
 COPY pom.xml .
 COPY .mvn .mvn
 COPY mvnw .
-RUN ./mvnw -B -q -DskipTests dependency:go-offline
+
+# Baixa dependências
+RUN ./mvnw -B -q -DskipTests org.apache.maven.plugins:maven-dependency-plugin:3.6.1:go-offline
 
 # Copia o código e compila
 COPY src src
-RUN ./mvnw -B -DskipTests clean package
+RUN ./mvnw -B -q -DskipTests package
 
 # --- Etapa 2: runtime ---
 FROM eclipse-temurin:21.0.8_9-jre
