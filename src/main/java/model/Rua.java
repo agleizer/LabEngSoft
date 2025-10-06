@@ -1,3 +1,5 @@
+package model;
+
 public class Rua {
     private String nome;
     private String bairro;

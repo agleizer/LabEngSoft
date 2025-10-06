@@ -1,0 +1,288 @@
+Guia de Desenvolvimento
+
+1. Visão Geral
+
+O Caminho Fácil é um projeto Java Spring Boot executado em um ambiente padronizado via Docker, com banco de dados PostgreSQL 17 e JDK 21 (LTS).
+
+Toda a configuração é feita para garantir que todos os integrantes do time desenvolvam e testem em condições idênticas, independentemente do sistema operacional.
+
+Pilares da arquitetura
+
+| Camada                      | Ferramenta                  | Responsabilidade principal                              |
+| --------------------------- | --------------------------- | ------------------------------------------------------- |
+| Ambiente idêntico       | Docker + Compose            | Mesmo sistema operacional, JDK 21 e PostgreSQL 17       |
+| Dependências Java       | Maven + Wrapper (`mvnw`)    | Controla bibliotecas e versão do Maven                  |
+| Colaboração e histórico | Git + GitHub + CI (Actions) | Versiona código, documenta e executa testes automáticos |
+
+Você pode escolher como desenvolver:
+
+* Fora do contêiner (Fluxo B) — usando o Maven e JDK locais
+* Dentro do contêiner (Fluxo C) — ambiente isolado e controlado
+
+> Regra de ouro: todos os commits e branches são feitos fora do contêiner.
+> O contêiner apenas roda e compila; ele nunca versiona código.
+
+---
+
+2. Estrutura do Repositório
+
+
+caminho-facil/
+├── .env.example               # Exemplo de variáveis de ambiente
+├── .env                       # Suas configurações locais (não versionado)
+├── Dockerfile                 # Define como o app Java é construído e executado
+├── docker-compose.yml         # Orquestra app + banco de dados
+├── pom.xml                    # Configurações Maven do projeto
+├── mvnw*, .mvn/               # Wrapper Maven (garante versão idêntica)
+├── src/
+│   ├── main/java/...          # Código-fonte Java (Spring Boot)
+│   └── main/resources/...     # Templates, configs e HTML
+├── .github/workflows/ci.yml   # Pipeline CI (GitHub Actions)
+├── .gitignore, .editorconfig, .gitattributes
+└── README_DEV.md              # Documentação adicional
+
+
+---
+
+3. Fluxo de Trabalho do Time
+
+3.1. Primeiro setup (somente uma vez)
+
+bash
+git clone https://github.com/<org>/<repo>.git
+cd caminho-facil
+cp .env.example .env
+docker compose up --build
+
+
+O Docker faz tudo:
+
+* Baixa o Postgres 17 e inicializa o banco
+* Compila o projeto Java (via Maven no contêiner)
+* Executa o app acessível em [http://localhost:8080](http://localhost:8080)
+
+---
+
+3.2. Editar código e versionar
+
+1. Edite o código localmente (VS Code, IntelliJ etc.)
+
+   > A pasta `src/` está montada no contêiner — as mudanças são refletidas automaticamente.
+
+2. Testar no Docker:
+
+   bash
+   docker compose build app
+   docker compose up -d app
+   docker compose logs -f app
+   
+
+   Isso recompila a imagem do app e mostra os logs em tempo real.
+
+3. Versionar fora do contêiner:
+
+   bash
+   git status
+   git add src/... pom.xml
+   git commit -m "feat: nova rota /avaliacoes"
+   git push origin minha-branch
+   
+
+> 🚫 Nunca faça `git add` ou `git commit` dentro do contêiner.
+> Ele é efêmero — se for removido, o histórico se perde.
+
+---
+
+3.3. Quando alterar dependências
+
+1. Edite o `pom.xml` (adicione ou atualize dependências).
+2. Faça commit e push:
+
+   bash
+   git add pom.xml
+   git commit -m "chore(deps): add springdoc"
+   git push
+   
+3. Rebuild do app:
+
+   bash
+   docker compose build app && docker compose up -d app
+   
+
+O GitHub Actions recompila e roda testes automaticamente em cada push.
+
+---
+
+3.4. Branches e sincronização
+
+| Ação                   | Comando                                    |
+| ---------------------- | ------------------------------------------ |
+| Criar branch nova      | `git checkout -b feat/nova-funcionalidade` |
+| Trocar de branch       | `git checkout main`                        |
+| Atualizar branch local | `git pull origin main`                     |
+| Enviar alterações      | `git push origin feat/nova-funcionalidade` |
+
+---
+
+4. Modos de Execução
+
+#Fluxo A – Paridade total (build completo no Docker)
+
+Mais estável, igual ao ambiente de produção e CI:
+
+bash
+docker compose up --build
+
+
+Compila tudo dentro da imagem — ideal para validar o comportamento “real” do sistema.
+
+---
+
+#Fluxo B – Desenvolvimento rápido (Maven local)
+
+Usa o JDK/Maven local, mas o banco via Docker:
+
+bash
+docker compose up -d db
+./mvnw spring-boot:run
+
+
+Permite hot reload com `spring-boot-devtools`.
+
+---
+
+#Fluxo C – Desenvolvimento dentro do contêiner
+
+Totalmente isolado, sem precisar instalar Maven localmente.
+
+No `docker-compose.yml` adicione:
+
+yaml
+  dev:
+    image: maven:3.9.11-eclipse-temurin-21
+    working_dir: /workspace
+    command: bash -lc "sleep infinity"
+    volumes:
+      - ./:/workspace
+    env_file: [.env]
+    depends_on:
+      db:
+        condition: service_healthy
+    profiles: ["dev"]
+
+
+Executar:
+
+bash
+docker compose --profile dev up -d db dev
+docker compose exec dev bash     # entra no contêiner
+./mvnw clean package
+./mvnw spring-boot:run
+
+
+Mesmo nesse fluxo, o código e o Git continuam sendo locais.
+
+---
+
+5. Comandos Essenciais
+
+| Ação             | Comando                                                   | O que faz                                |
+| ---------------- | --------------------------------------------------------- | ---------------------------------------- |
+| Subir app + DB   | `docker compose up --build`                               | Builda e inicia tudo                     |
+| Subir só o banco | `docker compose up -d db`                                 | Inicia apenas o Postgres                 |
+| Rebuild do app   | `docker compose build app && docker compose up -d app`    | Recompila e relança o app                |
+| Ver logs         | `docker compose logs -f app`                              | Mostra logs em tempo real                |
+| Parar tudo       | `docker compose down`                                     | Encerra contêineres                      |
+| Resetar banco    | `docker compose down -v`                                  | Remove contêineres e volume de dados     |
+| Entrar no app    | `docker compose exec app sh`                              | Abre shell no contêiner do app           |
+| Acessar Postgres | `docker compose exec db psql -U postgres -d caminhofacil` | Abre o psql dentro do contêiner do banco |
+
+---
+
+6. Ciclo Completo de Contribuição
+
+1. Criar branch (`git checkout -b feat/...`)
+2. Codar → testar (`docker compose build app`)
+3. Commitar fora do contêiner
+4. Enviar (`git push`)
+5. Abrir PR
+6. CI valida build/testes
+7. Merge na `main` com tudo verde ✅
+
+---
+
+7. Integração Contínua (CI)
+
+O pipeline `.github/workflows/ci.yml` executa automaticamente:
+
+* Ambiente Ubuntu + JDK 21 + Postgres 17
+* Comando:
+
+  bash
+  ./mvnw clean verify
+  
+* Marca o PR como “verde” se compilar e passar nos testes.
+
+Nada manual: cada push gera uma build automática.
+
+---
+
+8. Por que nunca commitar dentro do contêiner
+
+| Motivo                          | Explicação                                                                 |
+| ------------------------------- | -------------------------------------------------------------------------- |
+| Contêiner ≠ workspace real  | Ele é efêmero. Ao parar, tudo se perde.                                    |
+| Git não reconhece metadados | Autoria, timestamps e histórico ficam incorretos.                          |
+| Sem credenciais SSH         | Por segurança, não há tokens ou chaves dentro do contêiner.                |
+| Volume já montado           | Tudo o que muda dentro já está refletido fora. Commits dentro são inúteis. |
+
+Resumo:
+Edite e commite no host. Compile e teste onde quiser.
+
+---
+
+9. Cola Rápida de Setup
+
+Pré-requisitos:
+
+* WSL 2 (Windows)
+* Docker Desktop ativo (verificar com `docker info`)
+
+bash
+# Clonar e configurar
+git clone <repo>
+cd caminho-facil
+cp .env.example .env
+
+# Gerar wrapper Maven (se ainda não existir)
+docker run --rm -it -v ${PWD}:/workspace -w /workspace \
+  maven:3.9.11-eclipse-temurin-21 mvn -N io.takari:maven:wrapper
+
+# Subir tudo
+docker compose up --build
+
+
+---
+
+10. Boas Práticas Gerais
+
+* Use branches descritivas (`feat/`, `fix/`, `docs/`, etc.).
+* Cada commit deve ser atômico e legível.
+* Nunca suba senhas reais (somente `.env.example`).
+* Revise PRs antes do merge.
+* Testes devem passar local e no CI.
+* Atualize dependências em commits separados e com versões fixas.
+* Marque releases no GitHub (`v0.1.0`, `v0.2.0`, ...).
+
+---
+
+# Em resumo
+
+> * Desenvolva fora do contêiner.
+> * Compile dentro ou fora (Docker ou Maven local).
+> * Commits sempre no host.
+> * O CI garante que tudo compila e roda igual para todos.
+
+---
+
+Quer que eu inclua uma explicação visual (diagrama em texto ou Mermaid) mostrando como os contêineres se relacionam (app ↔ db ↔ host ↔ CI)? Isso tornaria o guia ainda mais didático.
