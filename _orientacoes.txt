@@ -52,6 +52,7 @@ bash
 git clone https://github.com/<org>/<repo>.git
 cd caminho-facil
 cp .env.example .env
+## se necessario, rode: sed -i 's/\r$//' mvnw
 docker compose up --build
 
 
@@ -257,6 +258,8 @@ cp .env.example .env
 # Gerar wrapper Maven (se ainda não existir)
 docker run --rm -it -v ${PWD}:/workspace -w /workspace \
   maven:3.9.11-eclipse-temurin-21 mvn -N io.takari:maven:wrapper
+
+## se necessario, rode: sed -i 's/\r$//' mvnw
 
 # Subir tudo
 docker compose up --build
