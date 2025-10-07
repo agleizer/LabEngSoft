@@ -1,0 +1,3 @@
+# Força todos os scripts a usarem LF (evita ^M no Linux)
+*.sh text eol=lf
+mvnw text eol=lf
