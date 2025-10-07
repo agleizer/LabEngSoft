@@ -1,3 +1,58 @@
-# Força todos os scripts a usarem LF (evita ^M no Linux)
+# =========================
+# Configuração de normalização de fim de linha
+# =========================
+# Faz o Git armazenar todos os arquivos no repositório com LF (padrão Unix),
+# independentemente do sistema operacional de quem comita.
+* text=auto eol=lf
+
+# =========================
+# Arquivos de script (Linux/Mac)
+# =========================
+# Força scripts de shell a usarem LF sempre (evita erro ^M no Docker)
 *.sh text eol=lf
 mvnw text eol=lf
+gradlew text eol=lf
+
+# =========================
+# Arquivos de lote (Windows)
+# =========================
+# Mantém CRLF, pois o Windows precisa disso.
+*.bat text eol=crlf
+*.cmd text eol=crlf
+
+# =========================
+# Arquivos de código-fonte
+# =========================
+# Java, XML, YAML, Dockerfile e similares devem ter LF
+*.java text eol=lf
+*.xml  text eol=lf
+*.yml  text eol=lf
+*.yaml text eol=lf
+Dockerfile text eol=lf
+*.properties text eol=lf
+*.md text eol=lf
+
+# =========================
+# Arquivos binários (não converter)
+# =========================
+# Evita que o Git tente mexer em arquivos binários (imagens, executáveis, etc)
+*.jar binary
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.pdf binary
+*.zip binary
+*.gz binary
+*.tar binary
+*.7z binary
+*.ttf binary
+*.otf binary
+
+# =========================
+# Arquivos do Maven Wrapper
+# =========================
+# Garante que o .jar seja tratado como binário (não corrompe)
+.mvn/wrapper/maven-wrapper.jar binary
+.mvn/wrapper/maven-wrapper.properties text eol=lf
