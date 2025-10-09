@@ -1,0 +1,94 @@
+/* ===============================
+   Caminho Fácil - Estilo Geral
+   =============================== */
+
+/* -------- Cores base -------- */
+:root {
+	--verde: #198754;
+	--verde-escuro: #146c43;
+	--cinza-claro: #f8f9fa;
+	--texto: #212529;
+}
+
+/* -------- Corpo -------- */
+body {
+	font-family: "Segoe UI", Roboto, sans-serif;
+	background-color: var(--cinza-claro);
+	color: var(--texto);
+	padding-top: 70px; /* espaço pro navbar fixo */
+}
+
+/* -------- Navbar -------- */
+.navbar {
+	box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+.navbar-brand {
+	font-weight: 600;
+}
+.nav-link:hover {
+	text-decoration: underline;
+}
+
+/* -------- Botões -------- */
+.btn-primary {
+	background-color: var(--verde);
+	border-color: var(--verde-escuro);
+}
+.btn-primary:hover {
+	background-color: var(--verde-escuro);
+}
+.btn-success {
+	background-color: var(--verde);
+	border-color: var(--verde-escuro);
+}
+.btn-success:hover {
+	background-color: var(--verde-escuro);
+}
+
+/* -------- Inputs e formulários -------- */
+input,
+select,
+textarea {
+	border-radius: 8px !important;
+}
+input:focus,
+select:focus,
+textarea:focus {
+	border-color: var(--verde);
+	box-shadow: 0 0 0 0.2rem rgba(25, 135, 84, 0.25);
+}
+
+/* -------- Mapas Leaflet -------- */
+#map {
+	border-radius: 12px;
+	border: 2px solid var(--verde);
+	height: 400px;
+	margin-bottom: 20px;
+}
+
+/* -------- Títulos e textos -------- */
+h4,
+h5,
+h6 {
+	color: var(--verde-escuro);
+	font-weight: 600;
+}
+
+/* -------- Footer opcional -------- */
+footer {
+	text-align: center;
+	padding: 10px 0;
+	margin-top: 20px;
+	color: #777;
+	font-size: 0.9rem;
+}
+
+/* -------- Ajustes responsivos -------- */
+@media (max-width: 576px) {
+	#map {
+		height: 300px;
+	}
+	.btn-lg {
+		font-size: 1rem;
+	}
+}

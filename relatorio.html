@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<title>Caminho Fácil – Relatório</title>
+
+		<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+		<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+		<link rel="stylesheet" href="assets/css/style.css" />
+
+		<style>
+			html,
+			body {
+				height: 100%;
+				margin: 0;
+			}
+			#map {
+				height: 400px;
+				border-radius: 10px;
+			}
+		</style>
+	</head>
+	<body class="bg-light">
+		<nav class="navbar navbar-dark bg-success fixed-top">
+			<div class="container-fluid">
+				<a class="navbar-brand" href="index.html">← Voltar</a>
+				<span class="navbar-text text-white">Gerar Relatório</span>
+			</div>
+		</nav>
+
+		<div class="container mt-5 pt-4">
+			<p>Selecione a área para análise e defina o raio desejado.</p>
+
+			<div class="mb-3">
+				<label class="form-label">Localização</label>
+				<input type="text" class="form-control" placeholder="Digite um endereço" />
+			</div>
+
+			<div class="mb-3">
+				<label for="raio" class="form-label">Raio (em metros)</label>
+				<input type="range" class="form-range" min="100" max="1000" step="100" id="raio" value="500" />
+				<p>Raio atual: <span id="valorRaio">500</span> m</p>
+			</div>
+
+			<div id="map"></div>
+
+			<div class="text-center mt-4">
+				<button class="btn btn-primary" id="btnRelatorio">Gerar Relatório</button>
+			</div>
+		</div>
+
+		<!-- Modal de sucesso -->
+		<div class="modal fade" id="modalSucesso" tabindex="-1" aria-labelledby="modalSucessoLabel" aria-hidden="true">
+			<div class="modal-dialog modal-dialog-centered">
+				<div class="modal-content border-success">
+					<div class="modal-header bg-success text-white">
+						<h5 class="modal-title" id="modalSucessoLabel">Relatório Gerado!</h5>
+						<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+					</div>
+					<div class="modal-body text-center">
+						<p>O relatório foi gerado com sucesso e o download iniciou automaticamente.</p>
+						<p>Arquivo: <strong>relatorio_caminho_facil.csv</strong></p>
+					</div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-success" data-bs-dismiss="modal">Fechar</button>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+		<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+		<script>
+			// --- Mapa interativo ---
+			const map = L.map("map").setView([-23.561, -46.655], 15);
+
+			L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+				attribution: "&copy; OpenStreetMap contributors",
+				maxZoom: 19,
+			}).addTo(map);
+
+			const centro = L.marker([-23.561, -46.655]).addTo(map).bindPopup("Centro da análise");
+			let circulo = L.circle([-23.561, -46.655], {
+				radius: 500,
+				color: "green",
+				fillOpacity: 0.2,
+			}).addTo(map);
+
+			const inputRaio = document.getElementById("raio");
+			const textoRaio = document.getElementById("valorRaio");
+
+			inputRaio.addEventListener("input", () => {
+				const r = parseInt(inputRaio.value);
+				textoRaio.textContent = r;
+				circulo.setRadius(r);
+			});
+
+			// --- Geração e download do CSV ---
+			document.getElementById("btnRelatorio").addEventListener("click", () => {
+				// Exemplo de conteúdo CSV
+				const csv = "Rua,Nota média,Observações\n" + "Rua XV de Novembro,4.2,Boa acessibilidade\n" + "Avenida Paulista,4.6,Iluminação adequada\n" + "Rua Augusta,3.8,Desníveis pontuais";
+
+				const blob = new Blob([csv], { type: "text/csv" });
+				const url = URL.createObjectURL(blob);
+				const a = document.createElement("a");
+				a.href = url;
+				a.download = "relatorio_caminho_facil.csv";
+				a.click();
+				URL.revokeObjectURL(url);
+
+				// Exibe o modal de sucesso
+				const modal = new bootstrap.Modal(document.getElementById("modalSucesso"));
+				modal.show();
+			});
+		</script>
+	</body>
+</html>

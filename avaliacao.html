@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<title>Caminho Fácil - Avaliação</title>
+		<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
+		<link rel="stylesheet" href="assets/css/style.css" />
+	</head>
+	<body class="bg-light">
+		<nav class="navbar navbar-dark bg-success fixed-top">
+			<div class="container-fluid">
+				<a class="navbar-brand" href="detalhes.html">← Voltar</a>
+				<span class="navbar-text text-white">Avaliar Calçada</span>
+			</div>
+		</nav>
+
+		<div class="container mt-5 pt-4">
+			<form>
+				<div class="mb-3">
+					<label class="form-label">Nota (1–5)</label>
+					<select class="form-select">
+						<option>1</option>
+						<option>2</option>
+						<option>3</option>
+						<option>4</option>
+						<option selected>5</option>
+					</select>
+				</div>
+				<div class="mb-3">
+					<label class="form-label">Comentário</label>
+					<textarea class="form-control" rows="3"></textarea>
+				</div>
+				<div class="mb-3">
+					<label class="form-label">Detalhes da calçada</label><br />
+					<input type="checkbox" /> Piso tátil presente<br />
+					<input type="checkbox" /> Rebaixamento de guia<br />
+					<input type="checkbox" /> Iluminação adequada
+				</div>
+				<div class="mb-3">
+					<label class="form-label">Foto (opcional)</label>
+					<input type="file" class="form-control" />
+				</div>
+				<div class="d-grid">
+					<button type="button" class="btn btn-primary" onclick="location.href='detalhes.html'">Enviar avaliação</button>
+				</div>
+			</form>
+		</div>
+
+		<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+	</body>
+</html>
