@@ -86,8 +86,11 @@
 			];
 
 			ruas.forEach((r) => {
-				const link = `detalhes.html?rua=${encodeURIComponent(r.nome)}`;
-				L.marker(r.coords).addTo(map).bindPopup(`<b>${r.nome}</b><br>Avaliação média: ${r.nota}<br><a href="${link}">Ver detalhes</a>`);
+				const url = new URL("detalhes.html", window.location.href);
+				url.searchParams.set("rua", r.nome);
+				const link = `<a href="${url.toString()}">Ver detalhes</a>`;
+
+				L.marker(r.coords).addTo(map).bindPopup(`<b>${r.nome}</b><br>Avaliação média: ${r.nota}<br>${link}`);
 			});
 		</script>
 

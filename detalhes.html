@@ -48,9 +48,17 @@
 
 		<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 		<script>
-			const params = new URLSearchParams(window.location.search);
-			const rua = params.get("rua") || "Rua não informada";
-			document.getElementById("titulo-rua").textContent = rua;
+			document.addEventListener("DOMContentLoaded", () => {
+				const params = new URLSearchParams(window.location.search);
+				const rua = params.get("rua");
+				const titulo = document.getElementById("titulo-rua");
+
+				if (rua && titulo) {
+					titulo.textContent = rua;
+				} else if (titulo) {
+					titulo.textContent = "Rua não informada";
+				}
+			});
 		</script>
 	</body>
 </html>
