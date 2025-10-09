@@ -86,7 +86,8 @@
 			];
 
 			ruas.forEach((r) => {
-				L.marker(r.coords).addTo(map).bindPopup(`<b>${r.nome}</b><br>Avaliação média: ${r.nota}<br><a href='detalhes.html'>Ver detalhes</a>`);
+				const link = `detalhes.html?rua=${encodeURIComponent(r.nome)}`;
+				L.marker(r.coords).addTo(map).bindPopup(`<b>${r.nome}</b><br>Avaliação média: ${r.nota}<br><a href="${link}">Ver detalhes</a>`);
 			});
 		</script>
 
