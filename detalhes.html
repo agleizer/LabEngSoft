@@ -54,9 +54,11 @@
 				const titulo = document.getElementById("titulo-rua");
 
 				if (rua && titulo) {
-					titulo.textContent = rua;
+					titulo.textContent = decodeURIComponent(rua);
+					console.log("Rua detectada:", rua); // depuração
 				} else if (titulo) {
 					titulo.textContent = "Rua não informada";
+					console.warn("Nenhum parâmetro 'rua' encontrado.");
 				}
 			});
 		</script>

@@ -50,9 +50,10 @@
 
 		<div class="container mt-5 pt-4">
 			<div class="input-group mb-3 mt-3">
-				<input type="text" class="form-control" placeholder="Buscar rua..." />
-				<button class="btn btn-success">Buscar</button>
+				<input type="text" id="campoBusca" class="form-control" placeholder="Digite o nome da rua..." />
+				<button id="botaoBusca" class="btn btn-success">Buscar</button>
 			</div>
+
 			<div id="map"></div>
 
 			<div class="text-center my-3">
@@ -88,12 +89,55 @@
 			ruas.forEach((r) => {
 				const url = new URL("detalhes.html", window.location.href);
 				url.searchParams.set("rua", r.nome);
-				const link = `<a href="${url.toString()}">Ver detalhes</a>`;
+				const linkHTML = `<a href="${url}">Ver detalhes</a>`;
 
-				L.marker(r.coords).addTo(map).bindPopup(`<b>${r.nome}</b><br>Avaliação média: ${r.nota}<br>${link}`);
+				L.marker(r.coords).addTo(map).bindPopup(`<b>${r.nome}</b><br>Avaliação média: ${r.nota}<br>${linkHTML}`);
 			});
 		</script>
 
 		<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+		<script>
+			const campoBusca = document.getElementById("campoBusca");
+			const botaoBusca = document.getElementById("botaoBusca");
+			let marcadorBusca;
+
+			botaoBusca.addEventListener("click", async () => {
+				const rua = campoBusca.value.trim();
+				if (!rua) {
+					alert("Digite o nome de uma rua!");
+					return;
+				}
+
+				try {
+					const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(rua)}+São Paulo,Brasil`;
+					const resp = await fetch(url);
+					const dados = await resp.json();
+
+					if (dados.length === 0) {
+						alert("Rua não encontrada.");
+						return;
+					}
+
+					const { lat, lon, display_name } = dados[0];
+
+					// Remove marcador anterior, se houver
+					if (marcadorBusca) map.removeLayer(marcadorBusca);
+
+					marcadorBusca = L.marker([lat, lon])
+						.addTo(map)
+						.bindPopup(`<b>${display_name}</b><br><a href="detalhes.html?rua=${encodeURIComponent(rua)}">Ver detalhes</a>`)
+						.openPopup();
+
+					map.setView([lat, lon], 17);
+				} catch (e) {
+					console.error("Erro na busca:", e);
+					alert("Erro ao buscar a rua. Tente novamente.");
+				}
+			});
+			campoBusca.addEventListener("keypress", (e) => {
+				if (e.key === "Enter") botaoBusca.click();
+			});
+		</script>
 	</body>
 </html>
