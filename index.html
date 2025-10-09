@@ -6,9 +6,8 @@
 		<title>Caminho Fácil – Mapa</title>
 
 		<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" />
-		<link rel="stylesheet" href="assets/css/style.css" />
-
 		<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+		<link rel="stylesheet" href="assets/css/style.css" />
 
 		<style>
 			html,
@@ -25,6 +24,7 @@
 			}
 		</style>
 	</head>
+
 	<body class="bg-light">
 		<nav class="navbar navbar-expand-lg navbar-dark bg-success fixed-top">
 			<div class="container-fluid">
@@ -62,24 +62,44 @@
 		</div>
 
 		<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-		<script>
-			const map = L.map("map").setView([-23.55, -46.63], 13); // São Paulo
+		<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
+		<script>
+			const map = L.map("map").setView([-23.55, -46.63], 13); // fallback: São Paulo
+
+			// --- camada base ---
 			L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
 				attribution: "&copy; OpenStreetMap contributors",
 				maxZoom: 19,
 			}).addTo(map);
 
-			// Localização do usuário (se permitido)
-			if (navigator.geolocation) {
-				navigator.geolocation.getCurrentPosition((pos) => {
-					const { latitude, longitude } = pos.coords;
-					map.setView([latitude, longitude], 16);
-					L.marker([latitude, longitude]).addTo(map).bindPopup("Você está aqui!").openPopup();
-				});
-			}
+			let marcadorUsuario = null;
+			let marcadorClique = null;
+			let marcadorBusca = null;
 
-			// Marcadores simulando ruas avaliadas
+			// --- localização automática do usuário ---
+			function localizarUsuario() {
+				if (navigator.geolocation) {
+					navigator.geolocation.getCurrentPosition(
+						(pos) => {
+							const { latitude, longitude } = pos.coords;
+							if (!marcadorUsuario) {
+								marcadorUsuario = L.marker([latitude, longitude]).addTo(map).bindPopup("Você está aqui!").openPopup();
+							} else {
+								marcadorUsuario.setLatLng([latitude, longitude]);
+							}
+							map.setView([latitude, longitude], 16);
+						},
+						(err) => {
+							console.warn("Erro ao obter localização:", err.message);
+						},
+						{ enableHighAccuracy: true, timeout: 10000 }
+					);
+				}
+			}
+			localizarUsuario();
+
+			// --- marcadores fixos simulados ---
 			const ruas = [
 				{ nome: "Rua XV de Novembro", coords: [-23.5489, -46.6388], nota: 4.2 },
 				{ nome: "Rua Augusta", coords: [-23.5552, -46.6627], nota: 3.8 },
@@ -89,18 +109,38 @@
 			ruas.forEach((r) => {
 				const url = new URL("detalhes.html", window.location.href);
 				url.searchParams.set("rua", r.nome);
-				const linkHTML = `<a href="${url}">Ver detalhes</a>`;
-
-				L.marker(r.coords).addTo(map).bindPopup(`<b>${r.nome}</b><br>Avaliação média: ${r.nota}<br>${linkHTML}`);
+				const link = `<a href="${url.toString()}">Ver detalhes</a>`;
+				L.marker(r.coords).addTo(map).bindPopup(`<b>${r.nome}</b><br>Avaliação média: ${r.nota}<br>${link}`);
 			});
-		</script>
 
-		<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+			// --- clique no mapa: descobre o nome da rua (reverse geocoding) ---
+			map.on("click", async (e) => {
+				const { lat, lng } = e.latlng;
 
-		<script>
+				if (marcadorClique) map.removeLayer(marcadorClique);
+
+				marcadorClique = L.marker([lat, lng]).addTo(map);
+
+				try {
+					const url = `https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lng}`;
+					const resp = await fetch(url);
+					const data = await resp.json();
+
+					let nomeRua = "Local desconhecido";
+					if (data && data.address) {
+						nomeRua = data.address.road || data.display_name || "Ponto sem nome";
+					}
+
+					marcadorClique.bindPopup(`<b>${nomeRua}</b><br><a href="detalhes.html?rua=${encodeURIComponent(nomeRua)}">Ver detalhes</a>`).openPopup();
+				} catch (err) {
+					console.error("Erro ao buscar nome da rua:", err);
+					marcadorClique.bindPopup("Erro ao identificar o local.").openPopup();
+				}
+			});
+
+			// --- busca por nome (forward geocoding) ---
 			const campoBusca = document.getElementById("campoBusca");
 			const botaoBusca = document.getElementById("botaoBusca");
-			let marcadorBusca;
 
 			botaoBusca.addEventListener("click", async () => {
 				const rua = campoBusca.value.trim();
@@ -120,8 +160,6 @@
 					}
 
 					const { lat, lon, display_name } = dados[0];
-
-					// Remove marcador anterior, se houver
 					if (marcadorBusca) map.removeLayer(marcadorBusca);
 
 					marcadorBusca = L.marker([lat, lon])
@@ -135,6 +173,7 @@
 					alert("Erro ao buscar a rua. Tente novamente.");
 				}
 			});
+
 			campoBusca.addEventListener("keypress", (e) => {
 				if (e.key === "Enter") botaoBusca.click();
 			});
