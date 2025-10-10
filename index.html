@@ -20,6 +20,7 @@
 			}
 
 			/* --- elementos flutuantes --- */
+			/* --- caixa de busca (desktop) --- */
 			.search-box {
 				position: absolute;
 				top: 15px;
@@ -32,6 +33,33 @@
 				border-radius: 8px;
 				box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
 				display: flex;
+			}
+
+			/* --- ajustes para mobile --- */
+			@media (max-width: 768px) {
+				.search-box {
+					top: 65px; /* afasta da borda superior, abaixo dos ícones */
+					left: 5%;
+					transform: none;
+					width: 90%;
+					max-width: none;
+					border-radius: 6px;
+				}
+
+				.search-box input {
+					padding: 8px;
+					font-size: 14px;
+				}
+
+				.search-box button {
+					padding: 0 10px;
+					font-size: 14px;
+				}
+
+				/* afasta controles de zoom do Leaflet do campo de busca */
+				.leaflet-top.leaflet-left {
+					top: 140px; /* move os botões + e - um pouco para baixo */
+				}
 			}
 
 			.search-box input {
