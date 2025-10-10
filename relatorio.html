@@ -2,12 +2,11 @@
 <html lang="pt-br">
 	<head>
 		<meta charset="UTF-8" />
-		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 		<title>Caminho Fácil – Relatório</title>
 
-		<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+		<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" />
 		<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-		<link rel="stylesheet" href="assets/css/style.css" />
 
 		<style>
 			html,
@@ -15,40 +14,150 @@
 				height: 100%;
 				margin: 0;
 			}
+
 			#map {
-				height: 400px;
+				height: 100vh;
+				width: 100vw;
+			}
+
+			/* --- barra de busca --- */
+			.search-box {
+				position: absolute;
+				top: 15px;
+				left: 50%;
+				transform: translateX(-50%);
+				z-index: 1000;
+				width: 90%;
+				max-width: 500px;
+				background: white;
+				border-radius: 8px;
+				box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+				display: flex;
+			}
+
+			.search-box input {
+				border: none;
+				padding: 10px;
+				flex: 1;
+				border-radius: 8px 0 0 8px;
+			}
+
+			.search-box button {
+				border: none;
+				background: #198754;
+				color: white;
+				padding: 0 15px;
+				border-radius: 0 8px 8px 0;
+			}
+
+			/* --- ícones no topo --- */
+			.top-icons {
+				position: absolute;
+				top: 15px;
+				right: 15px;
+				z-index: 1000;
+				display: flex;
+				gap: 10px;
+			}
+
+			.top-icons button {
+				border: none;
+				background: white;
+				border-radius: 50%;
+				width: 42px;
+				height: 42px;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+			}
+
+			/* --- sidebar lateral --- */
+			#sidebar {
+				position: fixed;
+				left: -250px;
+				top: 0;
+				height: 100%;
+				width: 250px;
+				background: #198754;
+				color: white;
+				padding-top: 60px;
+				transition: left 0.3s ease;
+				z-index: 1100;
+			}
+
+			#sidebar.active {
+				left: 0;
+			}
+
+			#sidebar a {
+				color: white;
+				display: block;
+				padding: 12px 20px;
+				text-decoration: none;
+			}
+
+			#sidebar a:hover {
+				background: rgba(255, 255, 255, 0.2);
+			}
+
+			/* --- controle de raio --- */
+			.radius-control {
+				position: absolute;
+				bottom: 110px;
+				left: 50%;
+				transform: translateX(-50%);
+				z-index: 1000;
+				background: white;
+				padding: 10px 15px;
 				border-radius: 10px;
+				box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+				text-align: center;
+				width: 300px;
+			}
+
+			/* --- botão gerar relatório --- */
+			#btnRelatorio {
+				position: absolute;
+				bottom: 30px;
+				left: 50%;
+				transform: translateX(-50%);
+				z-index: 1000;
 			}
 		</style>
 	</head>
-	<body class="bg-light">
-		<nav class="navbar navbar-dark bg-success fixed-top">
-			<div class="container-fluid">
-				<a class="navbar-brand" href="index.html">← Voltar</a>
-				<span class="navbar-text text-white">Gerar Relatório</span>
-			</div>
-		</nav>
 
-		<div class="container mt-5 pt-4">
-			<p>Selecione a área para análise e defina o raio desejado.</p>
+	<body>
+		<div id="map"></div>
 
-			<div class="mb-3">
-				<label class="form-label">Localização</label>
-				<input type="text" class="form-control" placeholder="Digite um endereço" />
-			</div>
-
-			<div class="mb-3">
-				<label for="raio" class="form-label">Raio (em metros)</label>
-				<input type="range" class="form-range" min="100" max="1000" step="100" id="raio" value="500" />
-				<p>Raio atual: <span id="valorRaio">500</span> m</p>
-			</div>
-
-			<div id="map"></div>
-
-			<div class="text-center mt-4">
-				<button class="btn btn-primary" id="btnRelatorio">Gerar Relatório</button>
-			</div>
+		<!-- Caixa de busca -->
+		<div class="search-box">
+			<input type="text" id="campoBusca" placeholder="Buscar endereço..." aria-label="Buscar endereço" />
+			<button id="botaoBusca">🔍</button>
 		</div>
+
+		<!-- Ícones superiores -->
+		<div class="top-icons">
+			<button id="menuBtn">☰</button>
+			<button onclick="window.location.href='login.html'">👤</button>
+		</div>
+
+		<!-- Sidebar lateral -->
+		<div id="sidebar">
+			<a href="index.html">Mapa</a>
+			<a href="rotas.html">Rotas</a>
+			<a href="config.html">Configurações</a>
+		</div>
+
+		<!-- Controle de raio -->
+		<div class="radius-control">
+			<label for="raio" class="form-label fw-bold">Raio de análise</label>
+			<input type="range" class="form-range" min="100" max="1000" step="100" id="raio" value="500" />
+			<p class="mb-0">Raio atual: <span id="valorRaio">500</span> m</p>
+		</div>
+
+		<!-- Botão gerar relatório -->
+		<button id="btnRelatorio" class="btn btn-primary btn-lg">📥 Gerar Relatório</button>
 
 		<!-- Modal de sucesso -->
 		<div class="modal fade" id="modalSucesso" tabindex="-1" aria-labelledby="modalSucessoLabel" aria-hidden="true">
@@ -73,33 +182,77 @@
 		<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
 		<script>
-			// --- Mapa interativo ---
-			const map = L.map("map").setView([-23.561, -46.655], 15);
-
+			const map = L.map("map").setView([-23.55, -46.63], 13);
 			L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
 				attribution: "&copy; OpenStreetMap contributors",
 				maxZoom: 19,
 			}).addTo(map);
 
-			const centro = L.marker([-23.561, -46.655]).addTo(map).bindPopup("Centro da análise");
-			let circulo = L.circle([-23.561, -46.655], {
-				radius: 500,
-				color: "green",
-				fillOpacity: 0.2,
-			}).addTo(map);
+			let marcador = null;
+			let circulo = null;
 
 			const inputRaio = document.getElementById("raio");
 			const textoRaio = document.getElementById("valorRaio");
+			const campoBusca = document.getElementById("campoBusca");
+			const botaoBusca = document.getElementById("botaoBusca");
 
+			// --- localização inicial ---
+			if (navigator.geolocation) {
+				navigator.geolocation.getCurrentPosition((pos) => {
+					const { latitude, longitude } = pos.coords;
+					map.setView([latitude, longitude], 15);
+					marcador = L.marker([latitude, longitude]).addTo(map);
+					circulo = L.circle([latitude, longitude], {
+						radius: 500,
+						color: "green",
+						fillOpacity: 0.2,
+					}).addTo(map);
+				});
+			}
+
+			// --- busca de endereço ---
+			botaoBusca.addEventListener("click", async () => {
+				const endereco = campoBusca.value.trim();
+				if (!endereco) return alert("Digite um endereço!");
+
+				try {
+					const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(endereco)}+São Paulo,Brasil`;
+					const resp = await fetch(url);
+					const dados = await resp.json();
+
+					if (dados.length === 0) return alert("Endereço não encontrado.");
+
+					const { lat, lon, display_name } = dados[0];
+					if (marcador) map.removeLayer(marcador);
+					if (circulo) map.removeLayer(circulo);
+
+					marcador = L.marker([lat, lon]).addTo(map).bindPopup(`<b>${display_name}</b>`).openPopup();
+
+					circulo = L.circle([lat, lon], {
+						radius: parseInt(inputRaio.value),
+						color: "green",
+						fillOpacity: 0.2,
+					}).addTo(map);
+
+					map.setView([lat, lon], 16);
+				} catch (e) {
+					alert("Erro ao buscar o endereço.");
+				}
+			});
+
+			campoBusca.addEventListener("keypress", (e) => {
+				if (e.key === "Enter") botaoBusca.click();
+			});
+
+			// --- ajuste de raio ---
 			inputRaio.addEventListener("input", () => {
 				const r = parseInt(inputRaio.value);
 				textoRaio.textContent = r;
-				circulo.setRadius(r);
+				if (circulo) circulo.setRadius(r);
 			});
 
-			// --- Geração e download do CSV ---
+			// --- botão gerar relatório ---
 			document.getElementById("btnRelatorio").addEventListener("click", () => {
-				// Exemplo de conteúdo CSV
 				const csv = "Rua,Nota média,Observações\n" + "Rua XV de Novembro,4.2,Boa acessibilidade\n" + "Avenida Paulista,4.6,Iluminação adequada\n" + "Rua Augusta,3.8,Desníveis pontuais";
 
 				const blob = new Blob([csv], { type: "text/csv" });
@@ -110,9 +263,14 @@
 				a.click();
 				URL.revokeObjectURL(url);
 
-				// Exibe o modal de sucesso
 				const modal = new bootstrap.Modal(document.getElementById("modalSucesso"));
 				modal.show();
+			});
+
+			// --- menu lateral ---
+			const sidebar = document.getElementById("sidebar");
+			document.getElementById("menuBtn").addEventListener("click", () => {
+				sidebar.classList.toggle("active");
 			});
 		</script>
 	</body>
