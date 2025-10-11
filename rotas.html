@@ -171,7 +171,7 @@
 				return dados.length ? dados[0] : null;
 			}
 
-			// --- obtém localização atual e exibe marcador ---
+			// --- obtém localização atual automaticamente ---
 			if (navigator.geolocation) {
 				navigator.geolocation.getCurrentPosition(
 					(pos) => {
@@ -186,9 +186,13 @@
 				);
 			}
 
-			// --- carrega destino automaticamente (mas não traça rota) ---
+			// --- comportamento depende da origem de navegação ---
 			if (ruaDestino) {
+				// ✅ Caso vindo de "detalhes.html?rua=..."
 				campoDestino.value = decodeURIComponent(ruaDestino);
+				campoOrigem.readOnly = true;
+				campoDestino.readOnly = true;
+
 				buscarEndereco(ruaDestino).then((d) => {
 					if (d) {
 						pontoDestino = L.latLng(d.lat, d.lon);
@@ -199,11 +203,44 @@
 					}
 				});
 			} else {
-				campoDestino.value = "Destino não informado";
+				// ✏️ Caso vindo do menu lateral
+				campoOrigem.removeAttribute("readonly");
+				campoDestino.removeAttribute("readonly");
+				campoOrigem.placeholder = "Digite o endereço de origem...";
+				campoDestino.placeholder = "Digite o endereço de destino...";
 			}
 
-			// --- traçar rota manualmente ao clicar no botão ---
-			document.getElementById("btnRota").addEventListener("click", () => {
+			// --- traçar rota manualmente ---
+			document.getElementById("btnRota").addEventListener("click", async () => {
+				// Se o usuário digitou manualmente
+				if (!ruaDestino) {
+					const origemTxt = campoOrigem.value.trim();
+					const destinoTxt = campoDestino.value.trim();
+
+					if (!origemTxt || !destinoTxt) {
+						alert("Preencha ambos os endereços!");
+						return;
+					}
+
+					const o = await buscarEndereco(origemTxt);
+					const d = await buscarEndereco(destinoTxt);
+
+					if (!o || !d) {
+						alert("Não foi possível localizar um dos endereços.");
+						return;
+					}
+
+					pontoOrigem = L.latLng(o.lat, o.lon);
+					pontoDestino = L.latLng(d.lat, d.lon);
+
+					if (origemMarker) map.removeLayer(origemMarker);
+					if (destinoMarker) map.removeLayer(destinoMarker);
+
+					origemMarker = L.marker(pontoOrigem).addTo(map).bindPopup("Origem");
+					destinoMarker = L.marker(pontoDestino).addTo(map).bindPopup("Destino");
+				}
+
+				// desenha a rota
 				if (!pontoOrigem || !pontoDestino) {
 					alert("Não foi possível determinar origem e destino.");
 					return;
