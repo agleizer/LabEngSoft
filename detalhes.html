@@ -17,7 +17,7 @@
 
 		<div class="container mt-5 pt-4">
 			<h4 id="titulo-rua" class="my-3">Rua selecionada</h4>
-			<button class="btn btn-outline-success mb-3" onclick="location.href='rotas.html'">Traçar rota</button>
+			<button id="btnRota" class="btn btn-outline-success mb-3">Traçar rota</button>
 
 			<div class="mb-4">
 				<h6>Avaliação Média</h6>
@@ -47,19 +47,31 @@
 		</div>
 
 		<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
 		<script>
 			document.addEventListener("DOMContentLoaded", () => {
+				// --- lê parâmetro da URL ---
 				const params = new URLSearchParams(window.location.search);
 				const rua = params.get("rua");
 				const titulo = document.getElementById("titulo-rua");
+				const btnRota = document.getElementById("btnRota");
 
 				if (rua && titulo) {
 					titulo.textContent = decodeURIComponent(rua);
-					console.log("Rua detectada:", rua); // depuração
+					console.log("Rua detectada:", rua);
 				} else if (titulo) {
 					titulo.textContent = "Rua não informada";
 					console.warn("Nenhum parâmetro 'rua' encontrado.");
 				}
+
+				// --- botão 'Traçar rota' ---
+				btnRota.addEventListener("click", () => {
+					if (rua) {
+						window.location.href = `rotas.html?rua=${encodeURIComponent(rua)}`;
+					} else {
+						alert("Rua não identificada.");
+					}
+				});
 			});
 		</script>
 	</body>

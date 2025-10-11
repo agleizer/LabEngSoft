@@ -153,13 +153,17 @@
 			let origemMarker = null;
 			let destinoMarker = null;
 			let rota = null;
+			let pontoOrigem = null;
+			let pontoDestino = null;
+
 			const campoOrigem = document.getElementById("origem");
 			const campoDestino = document.getElementById("destino");
 
-			// --- obtem rua passada como parâmetro ---
+			// --- lê rua de destino vinda da URL ---
 			const params = new URLSearchParams(window.location.search);
 			const ruaDestino = params.get("rua");
 
+			// --- função para buscar coordenadas por nome ---
 			async function buscarEndereco(endereco) {
 				const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(endereco)}+São Paulo,Brasil`;
 				const resp = await fetch(url);
@@ -167,35 +171,43 @@
 				return dados.length ? dados[0] : null;
 			}
 
-			// --- carregar localização atual ---
-			let pontoOrigem = null;
+			// --- obtém localização atual e exibe marcador ---
 			if (navigator.geolocation) {
-				navigator.geolocation.getCurrentPosition((pos) => {
-					const { latitude, longitude } = pos.coords;
-					pontoOrigem = L.latLng(latitude, longitude);
-					map.setView(pontoOrigem, 15);
-					origemMarker = L.marker(pontoOrigem).addTo(map).bindPopup("Você está aqui!").openPopup();
-					campoOrigem.value = "Minha localização atual";
-				});
+				navigator.geolocation.getCurrentPosition(
+					(pos) => {
+						const { latitude, longitude } = pos.coords;
+						pontoOrigem = L.latLng(latitude, longitude);
+						map.setView(pontoOrigem, 15);
+						origemMarker = L.marker(pontoOrigem).addTo(map).bindPopup("Você está aqui!").openPopup();
+						campoOrigem.value = "Minha localização atual";
+					},
+					(err) => console.warn("Erro ao obter localização:", err.message),
+					{ enableHighAccuracy: true, timeout: 10000 }
+				);
 			}
 
-			// --- carregar destino automaticamente ---
-			let pontoDestino = null;
+			// --- carrega destino automaticamente (mas não traça rota) ---
 			if (ruaDestino) {
 				campoDestino.value = decodeURIComponent(ruaDestino);
 				buscarEndereco(ruaDestino).then((d) => {
 					if (d) {
 						pontoDestino = L.latLng(d.lat, d.lon);
-						destinoMarker = L.marker(pontoDestino).addTo(map).bindPopup(`Destino: ${ruaDestino}`);
+						destinoMarker = L.marker(pontoDestino)
+							.addTo(map)
+							.bindPopup(`Destino: ${decodeURIComponent(ruaDestino)}`)
+							.openPopup();
 					}
 				});
 			} else {
 				campoDestino.value = "Destino não informado";
 			}
 
-			// --- traçar rota ---
+			// --- traçar rota manualmente ao clicar no botão ---
 			document.getElementById("btnRota").addEventListener("click", () => {
-				if (!pontoOrigem || !pontoDestino) return alert("Não foi possível determinar os pontos.");
+				if (!pontoOrigem || !pontoDestino) {
+					alert("Não foi possível determinar origem e destino.");
+					return;
+				}
 
 				if (rota) map.removeLayer(rota);
 				rota = L.polyline([pontoOrigem, pontoDestino], {
