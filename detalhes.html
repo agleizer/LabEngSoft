@@ -4,9 +4,70 @@
 		<meta charset="UTF-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
 		<title>Caminho Fácil - Detalhes</title>
+
 		<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
-		<link rel="stylesheet" href="assets/css/style.css" />
+
+		<style>
+			body {
+				background-color: #f8f9fa;
+			}
+
+			.rating-display {
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				gap: 8px;
+				font-size: 1.4rem;
+			}
+
+			.rating-display .star {
+				color: gold;
+				font-size: 1.6rem;
+			}
+
+			.progress {
+				height: 12px;
+			}
+
+			.criterio {
+				display: flex;
+				justify-content: space-between;
+				align-items: center;
+			}
+
+			.criterio label {
+				font-weight: 500;
+				margin-right: 10px;
+			}
+
+			.foto-rua {
+				border-radius: 10px;
+				box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+			}
+
+			.comentario {
+				background: white;
+				border-radius: 10px;
+				padding: 10px 15px;
+				margin-bottom: 10px;
+				box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+			}
+
+			.comentario strong {
+				color: #198754;
+			}
+
+			.btn-outline-success {
+				border-radius: 20px;
+			}
+
+			h6 {
+				margin-top: 20px;
+				font-weight: 600;
+			}
+		</style>
 	</head>
+
 	<body class="bg-light">
 		<nav class="navbar navbar-dark bg-success fixed-top">
 			<div class="container-fluid">
@@ -17,32 +78,72 @@
 
 		<div class="container mt-5 pt-4">
 			<h4 id="titulo-rua" class="my-3">Rua selecionada</h4>
-			<button id="btnRota" class="btn btn-outline-success mb-3">Traçar rota</button>
 
-			<div class="mb-4">
-				<h6>Avaliação Média</h6>
-				<p>★★★★☆ (4.2)</p>
-				<a href="avaliacao.html" class="btn btn-primary btn-sm">Fazer avaliação</a>
+			<div class="text-center mb-3">
+				<button id="btnRota" class="btn btn-outline-success">🚶 Traçar rota</button>
 			</div>
 
-			<div class="mb-3">
-				<h6>Fotos Recentes</h6>
-				<img src="assets/img/rua.png" class="img-fluid rounded" alt="Rua" />
+			<!-- Avaliação média -->
+			<div class="card p-3 mb-4 shadow-sm">
+				<h6 class="text-success mb-2">Avaliação média</h6>
+				<div class="rating-display">
+					<span class="star">★★★★☆</span>
+					<span>(4.2)</span>
+				</div>
+				<div class="text-center mt-2">
+					<a href="avaliacao.html" class="btn btn-success btn-sm rounded-pill">+ Fazer avaliação</a>
+				</div>
 			</div>
 
-			<div class="mb-3">
-				<h6>Características</h6>
-				<ul>
-					<li>Piso tátil presente</li>
-					<li>Rebaixamento de guia adequado</li>
-					<li>Boa iluminação</li>
-				</ul>
+			<!-- Características com percentuais -->
+			<div class="card p-3 mb-4 shadow-sm">
+				<h6 class="text-success">Características de acessibilidade</h6>
+
+				<div class="criterio mt-2">
+					<label>Piso tátil presente</label>
+					<span>90%</span>
+				</div>
+				<div class="progress mb-2">
+					<div class="progress-bar bg-success" style="width: 90%"></div>
+				</div>
+
+				<div class="criterio">
+					<label>Rebaixamento de guia</label>
+					<span>75%</span>
+				</div>
+				<div class="progress mb-2">
+					<div class="progress-bar bg-warning" style="width: 75%"></div>
+				</div>
+
+				<div class="criterio">
+					<label>Iluminação adequada</label>
+					<span>85%</span>
+				</div>
+				<div class="progress mb-2">
+					<div class="progress-bar bg-info" style="width: 85%"></div>
+				</div>
+
+				<div class="criterio">
+					<label>Calçada livre de obstáculos</label>
+					<span>70%</span>
+				</div>
+				<div class="progress">
+					<div class="progress-bar bg-danger" style="width: 70%"></div>
+				</div>
 			</div>
 
-			<div>
-				<h6>Comentários</h6>
-				<p><strong>Maria:</strong> Calçada em ótimo estado!</p>
-				<p><strong>João:</strong> Há um pequeno desnível perto da esquina.</p>
+			<!-- Fotos -->
+			<div class="card p-3 mb-4 shadow-sm">
+				<h6 class="text-success">Fotos recentes</h6>
+				<img src="assets/img/rua.png" class="img-fluid foto-rua mt-2" alt="Foto da rua" />
+			</div>
+
+			<!-- Comentários -->
+			<div class="card p-3 shadow-sm mb-5">
+				<h6 class="text-success">Comentários dos usuários</h6>
+				<div class="comentario"><strong>Maria:</strong> Calçada em ótimo estado!</div>
+				<div class="comentario"><strong>João:</strong> Há um pequeno desnível perto da esquina.</div>
+				<div class="comentario"><strong>Ana:</strong> Muito iluminada à noite, ótima para caminhar.</div>
 			</div>
 		</div>
 
@@ -50,7 +151,6 @@
 
 		<script>
 			document.addEventListener("DOMContentLoaded", () => {
-				// --- lê parâmetro da URL ---
 				const params = new URLSearchParams(window.location.search);
 				const rua = params.get("rua");
 				const titulo = document.getElementById("titulo-rua");
@@ -64,7 +164,6 @@
 					console.warn("Nenhum parâmetro 'rua' encontrado.");
 				}
 
-				// --- botão 'Traçar rota' ---
 				btnRota.addEventListener("click", () => {
 					if (rua) {
 						window.location.href = `rotas.html?rua=${encodeURIComponent(rua)}`;

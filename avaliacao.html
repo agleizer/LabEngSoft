@@ -4,10 +4,46 @@
 		<meta charset="UTF-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
 		<title>Caminho Fácil - Avaliação</title>
+
 		<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
-		<link rel="stylesheet" href="assets/css/style.css" />
+
+		<style>
+			body {
+				background-color: #f8f9fa;
+			}
+
+			/* estrelas */
+			.star-rating {
+				display: flex;
+				gap: 5px;
+				font-size: 2rem;
+				color: #ccc;
+				cursor: pointer;
+				justify-content: center;
+			}
+			.star.active {
+				color: gold;
+			}
+
+			/* switches */
+			.form-switch {
+				background: white;
+				border-radius: 10px;
+				padding: 10px 15px;
+				display: flex;
+				align-items: center;
+				justify-content: space-between;
+				box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+				margin-bottom: 8px;
+			}
+
+			.alert {
+				display: none;
+			}
+		</style>
 	</head>
-	<body class="bg-light">
+
+	<body>
 		<nav class="navbar navbar-dark bg-success fixed-top">
 			<div class="container-fluid">
 				<a class="navbar-brand" href="detalhes.html">← Voltar</a>
@@ -16,37 +52,125 @@
 		</nav>
 
 		<div class="container mt-5 pt-4">
-			<form>
-				<div class="mb-3">
-					<label class="form-label">Nota (1–5)</label>
-					<select class="form-select">
-						<option>1</option>
-						<option>2</option>
-						<option>3</option>
-						<option>4</option>
-						<option selected>5</option>
-					</select>
+			<form id="avaliacaoForm">
+				<!-- Estrelas -->
+				<div class="mb-4 text-center">
+					<div id="stars" class="star-rating">
+						<span class="star" data-value="1">★</span>
+						<span class="star" data-value="2">★</span>
+						<span class="star" data-value="3">★</span>
+						<span class="star" data-value="4">★</span>
+						<span class="star" data-value="5">★</span>
+					</div>
+					<input type="hidden" id="nota" value="0" />
 				</div>
+
+				<!-- Comentário -->
 				<div class="mb-3">
-					<label class="form-label">Comentário</label>
-					<textarea class="form-control" rows="3"></textarea>
+					<label class="form-label fw-bold">Comentário</label>
+					<textarea id="comentario" class="form-control" rows="3" placeholder="Escreva aqui seu comentário..."></textarea>
 				</div>
+
+				<!-- Detalhes -->
+				<div class="mb-4">
+					<label class="form-label fw-bold">Detalhes</label>
+
+					<div class="form-switch">
+						<label for="cadeirante">Adequado para cadeira de rodas?</label>
+						<input class="form-check-input" type="checkbox" id="cadeirante" checked />
+					</div>
+
+					<div class="form-switch">
+						<label for="bebe">Adequado para carrinhos de bebê?</label>
+						<input class="form-check-input" type="checkbox" id="bebe" checked />
+					</div>
+
+					<div class="form-switch">
+						<label for="idosos">Adequado para idosos?</label>
+						<input class="form-check-input" type="checkbox" id="idosos" checked />
+					</div>
+
+					<div class="form-switch">
+						<label for="tatil">Presença de piso tátil</label>
+						<input class="form-check-input" type="checkbox" id="tatil" checked />
+					</div>
+
+					<div class="form-switch">
+						<label for="rebaixamento">Rebaixamento de guia</label>
+						<input class="form-check-input" type="checkbox" id="rebaixamento" checked />
+					</div>
+
+					<div class="form-switch">
+						<label for="obstaculos">Calçada livre de obstáculos</label>
+						<input class="form-check-input" type="checkbox" id="obstaculos" checked />
+					</div>
+
+					<div class="form-switch">
+						<label for="iluminacao">Iluminação noturna</label>
+						<input class="form-check-input" type="checkbox" id="iluminacao" checked />
+					</div>
+				</div>
+
+				<!-- Foto -->
 				<div class="mb-3">
-					<label class="form-label">Detalhes da calçada</label><br />
-					<input type="checkbox" /> Piso tátil presente<br />
-					<input type="checkbox" /> Rebaixamento de guia<br />
-					<input type="checkbox" /> Iluminação adequada
+					<label class="form-label fw-bold">Foto (opcional)</label>
+					<input type="file" class="form-control" id="foto" />
 				</div>
-				<div class="mb-3">
-					<label class="form-label">Foto (opcional)</label>
-					<input type="file" class="form-control" />
+
+				<!-- Alertas -->
+				<div class="alert alert-danger" id="alertErro">⚠️ Preencha a nota e o comentário antes de enviar.</div>
+				<div class="alert alert-success text-center" id="alertSucesso">
+					✅ Avaliação enviada com sucesso! <br />
+					<button type="button" class="btn btn-outline-success mt-2" onclick="window.location.href='detalhes.html'">Voltar aos detalhes</button>
 				</div>
-				<div class="d-grid">
-					<button type="button" class="btn btn-primary" onclick="location.href='detalhes.html'">Enviar avaliação</button>
+
+				<!-- Botão Enviar -->
+				<div class="d-grid mt-4">
+					<button type="submit" class="btn btn-primary">Enviar avaliação</button>
 				</div>
 			</form>
 		</div>
 
 		<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+		<script>
+			const stars = document.querySelectorAll(".star");
+			const notaInput = document.getElementById("nota");
+			const alertErro = document.getElementById("alertErro");
+			const alertSucesso = document.getElementById("alertSucesso");
+			const form = document.getElementById("avaliacaoForm");
+
+			// controle de estrelas
+			stars.forEach((star) => {
+				star.addEventListener("click", () => {
+					const value = parseInt(star.dataset.value);
+					notaInput.value = value;
+					stars.forEach((s) => {
+						s.classList.toggle("active", parseInt(s.dataset.value) <= value);
+					});
+				});
+			});
+
+			// validação e envio
+			form.addEventListener("submit", (e) => {
+				e.preventDefault();
+				alertErro.style.display = "none";
+				alertSucesso.style.display = "none";
+
+				const nota = parseInt(notaInput.value);
+				const comentario = document.getElementById("comentario").value.trim();
+
+				if (!nota || !comentario) {
+					alertErro.style.display = "block";
+					return;
+				}
+
+				// simula envio
+				setTimeout(() => {
+					alertSucesso.style.display = "block";
+					window.scrollTo({ top: 0, behavior: "smooth" });
+				}, 400);
+			});
+		</script>
 	</body>
 </html>
