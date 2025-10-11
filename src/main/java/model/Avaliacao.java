@@ -1,12 +1,25 @@
 package model;
 
+import jakarta.persistence.*;
+import java.time.LocalDate;
+
+@Entity
+@Table(name = "avaliacao")
 public class Avaliacao {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @ManyToOne
+    @JoinColumn(name = "calcada_id")
+    private Calcada calcada;
+
     private float notaGeral;
     private float notaIdoso;
     private float notaCego;
     private float notaCadeirante;
     private float notaCarrinho;
-    private int dataAval;
+    private LocalDate dataAval;
     private String comentario;
     private boolean presencaPisoTatil;
     private boolean rebaixamentoGuia;
@@ -17,7 +30,7 @@ public class Avaliacao {
     public Avaliacao() {}
 
     // Construtor basico
-    public Avaliacao(float notaGeral, float notaIdoso, float notaCego, float notaCadeirante, float notaCarrinho, int dataAval, String comentario, boolean presencaPisoTatil, boolean rebaixamentoGuia, boolean semObstaculos, boolean iluminacaoNoturna) {
+    public Avaliacao(float notaGeral, float notaIdoso, float notaCego, float notaCadeirante, float notaCarrinho, LocalDate dataAval, String comentario, boolean presencaPisoTatil, boolean rebaixamentoGuia, boolean semObstaculos, boolean iluminacaoNoturna) {
         this.notaGeral = notaGeral;
         this.notaIdoso = notaIdoso;
         this.notaCego = notaCego;
@@ -46,8 +59,8 @@ public class Avaliacao {
     public float getNotaCarrinho() { return notaCarrinho; }
     public void setNotaCarrinho(float notaCarrinho) { this.notaCarrinho = notaCarrinho; }
 
-    public int getDataAval() { return dataAval; }
-    public void setDataAval(int dataAval) { this.dataAval = dataAval; }
+    public LocalDate getDataAval() { return dataAval; }
+    public void setDataAval(LocalDate dataAval) { this.dataAval = dataAval; }
 
     public String getComentario() { return comentario; }
     public void setComentario(String comentario) { this.comentario = comentario; }

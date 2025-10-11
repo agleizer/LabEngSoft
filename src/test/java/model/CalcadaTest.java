@@ -2,6 +2,7 @@ package model;
 
 import org.junit.jupiter.api.Test;
 import java.util.List;
+import java.time.LocalDate;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class CalcadaTest {
@@ -11,7 +12,9 @@ public class CalcadaTest {
     }
 
     private Avaliacao criarAvaliacao(float nota) {
-        return new Avaliacao(nota, 0, 0, 0, 0, 0, "Comentário", false, false, false, false);
+        LocalDate data = LocalDate.of(2024, 9, 25); // fixed test date
+        return new Avaliacao(nota, 0, 0, 0, 0, data,
+                             "Comentário", false, false, false, false);
     }
 
     @Test
@@ -38,7 +41,6 @@ public class CalcadaTest {
         calcada.adicionarAvaliacao(aval2);
         
         List<Avaliacao> avaliacoes = calcada.getAvaliacoes();
-        
         assertEquals(2, avaliacoes.size());
     }
 }

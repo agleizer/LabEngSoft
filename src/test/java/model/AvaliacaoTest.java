@@ -3,6 +3,8 @@ package model;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
+import java.time.LocalDate;
+
 public class AvaliacaoTest {
 
     @Test
@@ -20,11 +22,15 @@ public class AvaliacaoTest {
 
     @Test
     void testConstrutorBasico() {
+        LocalDate data = LocalDate.of(2024, 9, 25);
+
         Avaliacao avaliacao = new Avaliacao(
-            5.0f, 5.0f, 4.0f, 4.5f, 5.0f, 20240925, 
-            "Perfeita para todos", true, true, true, true
+            5.0f, 5.0f, 4.0f, 4.5f, 5.0f,
+            data,
+            "Perfeita para todos",
+            true, true, true, true
         );
-        
+
         assertEquals(5.0f, avaliacao.getNotaGeral(), 0.001);
         assertEquals(4.5f, avaliacao.getNotaCadeirante(), 0.001);
         assertTrue(avaliacao.isRebaixamentoGuia());

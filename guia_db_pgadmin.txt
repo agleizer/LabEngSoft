@@ -1,0 +1,34 @@
+1- DOWNLOAD DO PGADMIN ========================================================
+
+- Download no seguinte link: https://www.pgadmin.org/download/
+- Tem a opção docker, mas as opções Windows e Mac também parecem funcionar, pois é web based.
+- Clique no exe
+- Instalar
+
+2- COMEÇAR A RODAR O DOCKER ===================================================
+
+- Em algum terminal estilo Linux, como o git bash, digite: docker compose up
+- Nesse momento o app e o banco de dados estão rodando.
+- O banco de dados roda na porta 5432 por padrão
+
+3- REGISTRANDO DB NO PGADMIN ==================================================
+
+- Abra o pgadmin
+- Selecione opção de Register - Server
+	- Se ainda não tiver nada, é uma das primeiras opções que vai aparecer na tela
+- Em General -> Name, coloque: "LabEngSoft"
+- Em Connection
+	- Host name/address: "localhost"
+	- Port: "5432"
+	- Maintenance database: "caminhofacil"
+	- Username: "postgres"
+	- Password: "postgres"
+- Clicar Save
+- Agora o DB deve estar conectado ao pgadmin
+
+4- AS TABELAS =================================================================
+
+- As tabelas do nosso projeto serão encontradas no seguinte caminho:
+Servers > LabEngSoft > Databases > caminnhofacil > Schemas > public > Tables
+
+- Aí caso vocês queiram rodar uns comandos SQL, basta clicar com botão direito em cima de Tables e selecionar "query tool"

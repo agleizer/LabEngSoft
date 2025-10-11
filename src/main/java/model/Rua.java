@@ -1,6 +1,14 @@
 package model;
 
+import jakarta.persistence.*;
+
+@Entity
+@Table(name = "rua")
 public class Rua {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
     private String nome;
     private String bairro;
 
