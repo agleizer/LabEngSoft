@@ -174,12 +174,13 @@
 			let marcadorUsuario = null;
 			let marcadorClique = null;
 			let marcadorBusca = null;
+			let ultimaSelecao = null; // <- rastreia última ação do usuário ("auto", "clique" ou "busca")
 
 			function salvarRuaSelecionada(nomeRua) {
 				localStorage.setItem("ruaSelecionada", nomeRua);
 			}
 
-			// --- Localização do usuário com reverse geocoding ---
+			// --- Localização inicial (somente salva se o usuário não clicou ainda) ---
 			async function localizarUsuario() {
 				if (!navigator.geolocation) return;
 				navigator.geolocation.getCurrentPosition(
@@ -197,7 +198,11 @@
 							const data = await resp.json();
 							if (data && data.address) {
 								const nomeRua = data.address.road || data.display_name || "Local atual";
-								salvarRuaSelecionada(nomeRua);
+								if (!ultimaSelecao) {
+									// salva só se o usuário não fez outra escolha
+									salvarRuaSelecionada(nomeRua);
+									ultimaSelecao = "auto";
+								}
 							}
 						} catch (err) {
 							console.warn("Falha no reverse geocode:", err);
@@ -223,6 +228,7 @@
 						nomeRua = data.address.road || data.display_name || "Ponto sem nome";
 					}
 					salvarRuaSelecionada(nomeRua);
+					ultimaSelecao = "clique"; // <- agora damos prioridade ao clique
 					marcadorClique.bindPopup(`<b>${nomeRua}</b><br><a href="detalhes.html?rua=${encodeURIComponent(nomeRua)}" onclick="salvarRuaSelecionada('${nomeRua}')">Ver detalhes</a>`).openPopup();
 				} catch (err) {
 					marcadorClique.bindPopup("Erro ao identificar o local.").openPopup();
@@ -246,6 +252,7 @@
 					const { lat, lon, display_name } = dados[0];
 					if (marcadorBusca) map.removeLayer(marcadorBusca);
 					salvarRuaSelecionada(display_name);
+					ultimaSelecao = "busca"; // <- prioridade para busca
 
 					marcadorBusca = L.marker([lat, lon])
 						.addTo(map)
@@ -268,6 +275,8 @@
 				if (rua) {
 					e.preventDefault();
 					window.location.href = `detalhes.html?rua=${encodeURIComponent(rua)}`;
+				} else {
+					alert("Nenhuma rua selecionada!");
 				}
 			});
 

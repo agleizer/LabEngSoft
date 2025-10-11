@@ -89,15 +89,6 @@
 			.route-panel label {
 				font-weight: bold;
 			}
-
-			/* --- botão relatório --- */
-			#btnRelatorio {
-				position: absolute;
-				bottom: 25px;
-				left: 50%;
-				transform: translateX(-50%);
-				z-index: 1000;
-			}
 		</style>
 	</head>
 
@@ -121,11 +112,11 @@
 		<div class="route-panel">
 			<div class="mb-2">
 				<label>Origem</label>
-				<input type="text" id="origem" class="form-control" placeholder="Digite a origem ou use sua localização" />
+				<input type="text" id="origem" class="form-control" placeholder="Detectando sua localização..." readonly />
 			</div>
 			<div class="mb-2">
 				<label>Destino</label>
-				<input type="text" id="destino" class="form-control" placeholder="Digite o destino" />
+				<input type="text" id="destino" class="form-control" placeholder="Carregando destino..." readonly />
 			</div>
 
 			<div class="mb-2">
@@ -136,7 +127,7 @@
 				</div>
 				<div class="form-check">
 					<input class="form-check-input" type="checkbox" id="tatil" />
-					<label class="form-check-label" for="tátil">Presença de piso tátil</label>
+					<label class="form-check-label" for="tatil">Presença de piso tátil</label>
 				</div>
 				<div class="form-check">
 					<input class="form-check-input" type="checkbox" id="largas" />
@@ -148,9 +139,6 @@
 				<button id="btnRota" class="btn btn-primary">🚶 Traçar rota</button>
 			</div>
 		</div>
-
-		<!-- Botão relatório -->
-		<button id="btnRelatorio" class="btn btn-success btn-lg" onclick="window.location.href='relatorio.html'">📄 Gerar Relatório da Região</button>
 
 		<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 		<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
@@ -165,22 +153,13 @@
 			let origemMarker = null;
 			let destinoMarker = null;
 			let rota = null;
-
 			const campoOrigem = document.getElementById("origem");
 			const campoDestino = document.getElementById("destino");
-			const botaoRota = document.getElementById("btnRota");
 
-			// --- obter localização atual ---
-			if (navigator.geolocation) {
-				navigator.geolocation.getCurrentPosition((pos) => {
-					const { latitude, longitude } = pos.coords;
-					map.setView([latitude, longitude], 15);
-					origemMarker = L.marker([latitude, longitude]).addTo(map).bindPopup("Você está aqui!").openPopup();
-					campoOrigem.placeholder = "Localização atual detectada";
-				});
-			}
+			// --- obtem rua passada como parâmetro ---
+			const params = new URLSearchParams(window.location.search);
+			const ruaDestino = params.get("rua");
 
-			// --- busca genérica (geocoding) ---
 			async function buscarEndereco(endereco) {
 				const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(endereco)}+São Paulo,Brasil`;
 				const resp = await fetch(url);
@@ -188,44 +167,42 @@
 				return dados.length ? dados[0] : null;
 			}
 
+			// --- carregar localização atual ---
+			let pontoOrigem = null;
+			if (navigator.geolocation) {
+				navigator.geolocation.getCurrentPosition((pos) => {
+					const { latitude, longitude } = pos.coords;
+					pontoOrigem = L.latLng(latitude, longitude);
+					map.setView(pontoOrigem, 15);
+					origemMarker = L.marker(pontoOrigem).addTo(map).bindPopup("Você está aqui!").openPopup();
+					campoOrigem.value = "Minha localização atual";
+				});
+			}
+
+			// --- carregar destino automaticamente ---
+			let pontoDestino = null;
+			if (ruaDestino) {
+				campoDestino.value = decodeURIComponent(ruaDestino);
+				buscarEndereco(ruaDestino).then((d) => {
+					if (d) {
+						pontoDestino = L.latLng(d.lat, d.lon);
+						destinoMarker = L.marker(pontoDestino).addTo(map).bindPopup(`Destino: ${ruaDestino}`);
+					}
+				});
+			} else {
+				campoDestino.value = "Destino não informado";
+			}
+
 			// --- traçar rota ---
-			botaoRota.addEventListener("click", async () => {
-				const origem = campoOrigem.value.trim();
-				const destino = campoDestino.value.trim();
-				if (!destino && !origem) return alert("Informe pelo menos o destino!");
-
-				let pontoOrigem = null;
-				let pontoDestino = null;
-
-				// origem: localização atual ou texto
-				if (origemMarker) {
-					pontoOrigem = origemMarker.getLatLng();
-				} else if (origem) {
-					const o = await buscarEndereco(origem);
-					if (!o) return alert("Origem não encontrada.");
-					pontoOrigem = L.latLng(o.lat, o.lon);
-					if (origemMarker) map.removeLayer(origemMarker);
-					origemMarker = L.marker(pontoOrigem).addTo(map).bindPopup("Origem");
-				}
-
-				// destino
-				if (destino) {
-					const d = await buscarEndereco(destino);
-					if (!d) return alert("Destino não encontrado.");
-					pontoDestino = L.latLng(d.lat, d.lon);
-					if (destinoMarker) map.removeLayer(destinoMarker);
-					destinoMarker = L.marker(pontoDestino).addTo(map).bindPopup("Destino");
-				}
+			document.getElementById("btnRota").addEventListener("click", () => {
+				if (!pontoOrigem || !pontoDestino) return alert("Não foi possível determinar os pontos.");
 
 				if (rota) map.removeLayer(rota);
-
-				if (pontoOrigem && pontoDestino) {
-					const pontos = [pontoOrigem, pontoDestino];
-					rota = L.polyline(pontos, { color: "blue", weight: 4 }).addTo(map);
-					map.fitBounds(rota.getBounds());
-				} else {
-					alert("Não foi possível determinar os pontos da rota.");
-				}
+				rota = L.polyline([pontoOrigem, pontoDestino], {
+					color: "blue",
+					weight: 4,
+				}).addTo(map);
+				map.fitBounds(rota.getBounds());
 			});
 
 			// --- sidebar ---

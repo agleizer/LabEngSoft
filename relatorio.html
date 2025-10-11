@@ -124,6 +124,20 @@
 				transform: translateX(-50%);
 				z-index: 1000;
 			}
+
+			/* --- ajustes mobile --- */
+			@media (max-width: 768px) {
+				.search-box {
+					top: 65px;
+					left: 5%;
+					transform: none;
+					width: 90%;
+					max-width: none;
+				}
+				.leaflet-top.leaflet-left {
+					top: 140px; /* empurra os botões + e - para baixo */
+				}
+			}
 		</style>
 	</head>
 
@@ -209,6 +223,20 @@
 					}).addTo(map);
 				});
 			}
+
+			// --- clique no mapa ---
+			map.on("click", (e) => {
+				const { lat, lng } = e.latlng;
+				if (marcador) map.removeLayer(marcador);
+				if (circulo) map.removeLayer(circulo);
+
+				marcador = L.marker([lat, lng]).addTo(map).bindPopup("Ponto selecionado").openPopup();
+				circulo = L.circle([lat, lng], {
+					radius: parseInt(inputRaio.value),
+					color: "green",
+					fillOpacity: 0.2,
+				}).addTo(map);
+			});
 
 			// --- busca de endereço ---
 			botaoBusca.addEventListener("click", async () => {
