@@ -174,7 +174,7 @@
 			// --- obtém localização atual automaticamente ---
 			if (navigator.geolocation) {
 				navigator.geolocation.getCurrentPosition(
-					async (pos) => {
+					(pos) => {
 						const { latitude, longitude } = pos.coords;
 						pontoOrigem = L.latLng(latitude, longitude);
 						map.setView(pontoOrigem, 15);
@@ -199,27 +199,35 @@
 					}
 				});
 			} else {
-				// Se veio direto do menu, deixa os campos vazios
 				campoOrigem.placeholder = "Digite o endereço de origem...";
 				campoDestino.placeholder = "Digite o endereço de destino...";
 			}
 
-			// --- ambos os campos sempre editáveis ---
+			// --- sempre editável ---
 			campoOrigem.removeAttribute("readonly");
 			campoDestino.removeAttribute("readonly");
 
 			// --- traçar rota manualmente ---
 			document.getElementById("btnRota").addEventListener("click", async () => {
-				const origemTxt = campoOrigem.value.trim();
-				const destinoTxt = campoDestino.value.trim();
+				let origemTxt = campoOrigem.value.trim();
+				let destinoTxt = campoDestino.value.trim();
 
 				if (!origemTxt || !destinoTxt) {
 					alert("Preencha ambos os endereços!");
 					return;
 				}
 
-				const o = await buscarEndereco(origemTxt);
-				const d = await buscarEndereco(destinoTxt);
+				let o = null;
+				let d = null;
+
+				// 👉 Se o usuário deixou “Minha localização atual”, usa as coordenadas do GPS
+				if (origemTxt.toLowerCase().includes("minha localização") && pontoOrigem) {
+					o = { lat: pontoOrigem.lat, lon: pontoOrigem.lng };
+				} else {
+					o = await buscarEndereco(origemTxt);
+				}
+
+				d = await buscarEndereco(destinoTxt);
 
 				if (!o || !d) {
 					alert("Não foi possível localizar um dos endereços.");
