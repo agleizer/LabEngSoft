@@ -1,34 +1,45 @@
 package model;
 
-import java.util.Date;
+import jakarta.persistence.*;
+import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.ArrayList; // CORREÇÃO: Importa a classe ArrayList
 
+@Entity
+@Table(name = "relatorio")
 public class Relatorio {
-    private Date dataGeracaoRelatorio;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    private LocalDate dataGeracaoRelatorio;
     private String area;
     private String autor;
     private String mediaNotas;
 
-    private List<Avaliacao> avaliacoes;   // assoc com Avaliações
+    @ManyToMany
+    @JoinTable(
+        name = "relatorio_avaliacao",
+        joinColumns = @JoinColumn(name = "relatorio_id"),
+        inverseJoinColumns = @JoinColumn(name = "avaliacao_id")
+    )
+    private List<Avaliacao> avaliacoes = new ArrayList<>();
 
-    // Construtor vazio
-    public Relatorio() {
-        this.avaliacoes = new ArrayList<>(); // Inicialização para evitar NullPointerException
-    }
+    // No-arg constructor (required by JPA)
+    public Relatorio() {}
 
-    // Construtor basico
-    public Relatorio(Date dataGeracaoRelatorio, String area, String autor, String mediaNotas) {
+    // Convenience constructor for testing or easy creation
+    public Relatorio(LocalDate dataGeracaoRelatorio, String area, String autor, String mediaNotas) {
         this.dataGeracaoRelatorio = dataGeracaoRelatorio;
         this.area = area;
         this.autor = autor;
         this.mediaNotas = mediaNotas;
-        this.avaliacoes = new ArrayList<>(); // Boa prática
+        this.avaliacoes = new ArrayList<>();
     }
 
-    // getters e setters
-    public Date getDataGeracaoRelatorio() { return dataGeracaoRelatorio; }
-    public void setDataGeracaoRelatorio(Date dataGeracaoRelatorio) { this.dataGeracaoRelatorio = dataGeracaoRelatorio; }
+    // getters and setters
+    public LocalDate getDataGeracaoRelatorio() { return dataGeracaoRelatorio; }
+    public void setDataGeracaoRelatorio(LocalDate dataGeracaoRelatorio) { this.dataGeracaoRelatorio = dataGeracaoRelatorio; }
 
     public String getArea() { return area; }
     public void setArea(String area) { this.area = area; }

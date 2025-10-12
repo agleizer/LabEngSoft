@@ -1,9 +1,16 @@
 package model;
 
+import jakarta.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
 
+@Entity
+@Table(name = "calcada")
 public class Calcada {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
     private String nome;
     private float avaliacaoMedia;
     private double latitudeIni;
@@ -11,7 +18,11 @@ public class Calcada {
     private double latitudeFim;
     private double longitudeFim;
 
+    @ManyToOne
+    @JoinColumn(name = "rua_id")
     private Rua rua;                          // assoc com Rua
+
+    @OneToMany(mappedBy = "calcada", cascade = CascadeType.ALL)
     private List<Avaliacao> avaliacoes;       // assoc com Avaliações
 
     // Construtor vazio
