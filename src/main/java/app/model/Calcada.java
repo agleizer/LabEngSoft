@@ -1,8 +1,10 @@
-package model;
+package app.model;
 
 import jakarta.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
+
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 @Entity
 @Table(name = "calcada")
@@ -23,7 +25,8 @@ public class Calcada {
     private Rua rua;                          // assoc com Rua
 
     @OneToMany(mappedBy = "calcada", cascade = CascadeType.ALL)
-    private List<Avaliacao> avaliacoes;       // assoc com Avaliações
+    @JsonManagedReference
+    private List<Avaliacao> avaliacoes;
 
     // Construtor vazio
     public Calcada() {

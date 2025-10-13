@@ -5,10 +5,15 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 
-import model.Rua;
-import repositories.RuaDAO;
+import app.model.Rua;
+import app.model.Calcada;
+import app.model.Avaliacao;
+import app.repositories.RuaDAO;
+import app.repositories.CalcadaDAO;
+import app.repositories.AvaliacaoDAO;
 
 import java.util.List;
+import java.time.LocalDate;
 
 @SpringBootApplication
 public class Main {

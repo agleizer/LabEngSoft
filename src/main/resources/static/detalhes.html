@@ -20,7 +20,7 @@
 				font-size: 1.4rem;
 			}
 
-			.rating-display .star {
+			.star {
 				color: gold;
 				font-size: 1.6rem;
 			}
@@ -69,6 +69,7 @@
 	</head>
 
 	<body class="bg-light">
+		<!-- Navbar -->
 		<nav class="navbar navbar-dark bg-success fixed-top">
 			<div class="container-fluid">
 				<a class="navbar-brand" href="index.html">← Voltar</a>
@@ -76,8 +77,9 @@
 			</div>
 		</nav>
 
-		<div class="container mt-5 pt-4">
-			<h4 id="titulo-rua" class="my-3">Rua selecionada</h4>
+		<!-- Conteúdo -->
+		<div class="container mt-5 pt-4" id="dados-rua">
+			<h4 id="titulo-rua" class="my-3 text-center">Rua selecionada</h4>
 
 			<div class="text-center mb-3">
 				<button id="btnRota" class="btn btn-outline-success">🚶 Traçar rota</button>
@@ -86,91 +88,128 @@
 			<!-- Avaliação média -->
 			<div class="card p-3 mb-4 shadow-sm">
 				<h6 class="text-success mb-2">Avaliação média</h6>
-				<div class="rating-display">
-					<span class="star">★★★★☆</span>
-					<span>(4.2)</span>
+				<div class="rating-display" id="media-geral">
+					<span id="stars">☆☆☆☆☆</span>
+					<span id="valor-media">(N/A)</span>
 				</div>
 				<div class="text-center mt-2">
-					<a href="avaliacao.html" class="btn btn-success btn-sm rounded-pill">+ Fazer avaliação</a>
+					<a href="avaliacao.html" class="btn btn-success btn-sm rounded-pill"> + Fazer avaliação </a>
 				</div>
 			</div>
 
-			<!-- Características com percentuais -->
+			<!-- Características de acessibilidade -->
 			<div class="card p-3 mb-4 shadow-sm">
 				<h6 class="text-success">Características de acessibilidade</h6>
 
-				<div class="criterio mt-2">
-					<label>Piso tátil presente</label>
-					<span>90%</span>
-				</div>
+				<div id="piso" class="criterio mt-2"><label>Piso tátil presente</label><span>0%</span></div>
 				<div class="progress mb-2">
-					<div class="progress-bar bg-success" style="width: 90%"></div>
+					<div class="progress-bar bg-success" style="width: 0%"></div>
 				</div>
 
-				<div class="criterio">
-					<label>Rebaixamento de guia</label>
-					<span>75%</span>
-				</div>
+				<div id="rebaixamento" class="criterio"><label>Rebaixamento de guia</label><span>0%</span></div>
 				<div class="progress mb-2">
-					<div class="progress-bar bg-warning" style="width: 75%"></div>
+					<div class="progress-bar bg-warning" style="width: 0%"></div>
 				</div>
 
-				<div class="criterio">
-					<label>Iluminação adequada</label>
-					<span>85%</span>
-				</div>
+				<div id="iluminacao" class="criterio"><label>Iluminação adequada</label><span>0%</span></div>
 				<div class="progress mb-2">
-					<div class="progress-bar bg-info" style="width: 85%"></div>
+					<div class="progress-bar bg-info" style="width: 0%"></div>
 				</div>
 
-				<div class="criterio">
-					<label>Calçada livre de obstáculos</label>
-					<span>70%</span>
-				</div>
+				<div id="livre" class="criterio"><label>Calçada livre de obstáculos</label><span>0%</span></div>
 				<div class="progress">
-					<div class="progress-bar bg-danger" style="width: 70%"></div>
+					<div class="progress-bar bg-danger" style="width: 0%"></div>
 				</div>
-			</div>
-
-			<!-- Fotos -->
-			<div class="card p-3 mb-4 shadow-sm">
-				<h6 class="text-success">Fotos recentes</h6>
-				<img src="assets/img/rua.png" class="img-fluid foto-rua mt-2" alt="Foto da rua" />
 			</div>
 
 			<!-- Comentários -->
-			<div class="card p-3 shadow-sm mb-5">
-				<h6 class="text-success">Comentários dos usuários</h6>
-				<div class="comentario"><strong>Maria:</strong> Calçada em ótimo estado!</div>
-				<div class="comentario"><strong>João:</strong> Há um pequeno desnível perto da esquina.</div>
-				<div class="comentario"><strong>Ana:</strong> Muito iluminada à noite, ótima para caminhar.</div>
+			<div class="card p-3 shadow-sm mb-5" id="comentarios">
+				<h6 class="text-success">Comentários</h6>
+				<p class="text-muted">Nenhum comentário ainda.</p>
 			</div>
 		</div>
 
 		<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
 		<script>
-			document.addEventListener("DOMContentLoaded", () => {
+			document.addEventListener("DOMContentLoaded", async () => {
 				const params = new URLSearchParams(window.location.search);
 				const rua = params.get("rua");
 				const titulo = document.getElementById("titulo-rua");
 				const btnRota = document.getElementById("btnRota");
 
-				if (rua && titulo) {
-					titulo.textContent = decodeURIComponent(rua);
-					console.log("Rua detectada:", rua);
-				} else if (titulo) {
-					titulo.textContent = "Rua não informada";
-					console.warn("Nenhum parâmetro 'rua' encontrado.");
-				}
+				if (rua) titulo.textContent = decodeURIComponent(rua);
+				else titulo.textContent = "Rua não informada";
 
-				btnRota.addEventListener("click", () => {
-					if (rua) {
-						window.location.href = `rotas.html?rua=${encodeURIComponent(rua)}`;
-					} else {
-						alert("Rua não identificada.");
+				try {
+					// 1️⃣ Buscar calçada correspondente à rua
+					const respCalc = await fetch(`/api/calcadas?rua=${encodeURIComponent(rua)}`);
+					if (!respCalc.ok) throw new Error("Erro ao buscar calçadas");
+					const calcadas = await respCalc.json();
+					if (!calcadas.length) throw new Error("Nenhuma calçada encontrada");
+
+					const calcadaId = calcadas[0].id;
+
+					// 2️⃣ Buscar resumo de avaliações
+					const respResumo = await fetch(`/api/avaliacoes/resumo?calcadaId=${calcadaId}`);
+					if (!respResumo.ok) throw new Error("Erro ao buscar resumo");
+					const resumo = await respResumo.json();
+
+					// Se não houver avaliações, exibe mensagem sutil
+					if (!resumo || Object.keys(resumo).length === 0) {
+						document.querySelector("#valor-media").textContent = "(N/A)";
+						document.querySelector("#comentarios").innerHTML = "<h6 class='text-success'>Comentários</h6><p class='text-muted'>Nenhum dado cadastrado para esta rua.</p>";
+						return;
 					}
-				});
+
+					// 3️⃣ Avaliação média e estrelas
+					const valorMedia = document.getElementById("valor-media");
+					const starsContainer = document.getElementById("stars");
+					const media = resumo.mediaGeral || 0;
+					valorMedia.textContent = `(${media > 0 ? media.toFixed(1) : "N/A"})`;
+
+					const fullStars = Math.floor(media);
+					const halfStar = media % 1 >= 0.5;
+					let starsHTML = "";
+					for (let i = 0; i < 5; i++) {
+						if (i < fullStars) starsHTML += "★";
+						else if (i === fullStars && halfStar) starsHTML += "☆";
+						else starsHTML += "☆";
+					}
+					starsContainer.textContent = starsHTML;
+
+					// 4️⃣ Percentuais
+					const setProgress = (id, valor) => {
+						const bar = document.querySelector(`#${id} + .progress .progress-bar`);
+						const label = document.querySelector(`#${id} span`);
+						if (bar && label) {
+							bar.style.width = valor + "%";
+							label.textContent = valor + "%";
+						}
+					};
+
+					setProgress("piso", resumo.pisoTatil || 0);
+					setProgress("rebaixamento", resumo.rebaixamentoGuia || 0);
+					setProgress("iluminacao", resumo.iluminacaoNoturna || 0);
+					setProgress("livre", resumo.semObstaculos || 0);
+
+					// 5️⃣ Comentários
+					const comentariosDiv = document.getElementById("comentarios");
+					if (resumo.comentarios && resumo.comentarios.length > 0) {
+						comentariosDiv.innerHTML = "<h6 class='text-success'>Comentários</h6>" + resumo.comentarios.map((c) => `<div class="comentario"><strong>Usuário:</strong> ${c}</div>`).join("");
+					} else {
+						comentariosDiv.innerHTML = "<h6 class='text-success'>Comentários</h6><p class='text-muted'>Nenhum comentário ainda.</p>";
+					}
+
+					// 6️⃣ Botão "Traçar rota"
+					btnRota.addEventListener("click", () => {
+						window.location.href = `rotas.html?rua=${encodeURIComponent(rua)}`;
+					});
+				} catch (err) {
+					console.warn("Aviso:", err.message);
+					document.querySelector("#valor-media").textContent = "(N/A)";
+					document.querySelector("#comentarios").innerHTML = "<h6 class='text-success'>Comentários</h6><p class='text-muted'>Nenhum dado cadastrado para esta rua.</p>";
+				}
 			});
 		</script>
 	</body>

@@ -1,4 +1,4 @@
-package dtos;
+package app.dtos;
 
 public record CaracteristicasDTO(
         double piso_tatil,

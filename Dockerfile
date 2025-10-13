@@ -13,6 +13,7 @@ ENV MAVEN_CONFIG=""
 COPY pom.xml .
 COPY .mvn .mvn
 COPY mvnw .
+RUN chmod +x mvnw
 
 # Baixa dependências
 RUN ./mvnw -B -q -DskipTests org.apache.maven.plugins:maven-dependency-plugin:3.6.1:go-offline

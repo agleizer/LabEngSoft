@@ -1,7 +1,7 @@
-package controllers;
+package app.controllers;
 
-import dtos.CalcadaDTO;
-import services.CalcadasService;
+import app.dtos.CalcadaDTO;
+import app.services.CalcadasService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;

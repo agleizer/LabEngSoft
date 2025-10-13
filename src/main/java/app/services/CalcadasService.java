@@ -1,7 +1,7 @@
-package services;
+package app.services;
 
-import dtos.*;
-import repositories.CalcadasRepository;
+import app.dtos.*;
+import app.repositories.CalcadasRepository;
 import org.springframework.stereotype.Service;
 import java.util.*;
 

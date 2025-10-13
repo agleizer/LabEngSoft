@@ -1,11 +1,11 @@
-package repositories;
+package app.repositories;
 
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
-import model.Calcada;
-import model.DatabaseConnection;
+import app.model.Calcada;
+import app.model.DatabaseConnection;
 
 public class CalcadaDAO {
 

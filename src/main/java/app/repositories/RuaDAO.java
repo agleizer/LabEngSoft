@@ -1,9 +1,9 @@
-package repositories;
+package app.repositories;
 
 import org.springframework.stereotype.Repository;
 
-import model.DatabaseConnection;
-import model.Rua;
+import app.model.DatabaseConnection;
+import app.model.Rua;
 
 import java.sql.*;
 import java.util.ArrayList;
