@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<title>Caminho Fácil - Login</title>
+		<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
+	</head>
+
+	<body class="bg-light">
+		<nav class="navbar navbar-dark bg-success fixed-top">
+			<div class="container-fluid">
+				<a class="navbar-brand" href="index.html">← Voltar</a>
+				<span class="navbar-text text-white">Acesso do Usuário</span>
+			</div>
+		</nav>
+
+		<div class="container mt-5 pt-4">
+			<!-- Área de mensagens -->
+			<div id="alertBox"></div>
+
+			<ul class="nav nav-tabs" id="myTab" role="tablist">
+				<li class="nav-item" role="presentation">
+					<button class="nav-link active" id="login-tab" data-bs-toggle="tab" data-bs-target="#login" type="button" role="tab">Login</button>
+				</li>
+				<li class="nav-item" role="presentation">
+					<button class="nav-link" id="cadastro-tab" data-bs-toggle="tab" data-bs-target="#cadastro" type="button" role="tab">Cadastro</button>
+				</li>
+			</ul>
+
+			<div class="tab-content mt-3">
+				<!-- --- LOGIN --- -->
+				<div class="tab-pane fade show active" id="login" role="tabpanel">
+					<form id="formLogin">
+						<div class="mb-3">
+							<label class="form-label">E-mail</label>
+							<input id="loginEmail" type="email" class="form-control" placeholder="exemplo@email.com" />
+						</div>
+						<div class="mb-3">
+							<label class="form-label">Senha</label>
+							<input id="loginSenha" type="password" class="form-control" placeholder="••••••••" />
+						</div>
+						<div class="d-grid">
+							<button type="button" class="btn btn-primary" id="btnEntrar">Entrar</button>
+						</div>
+					</form>
+				</div>
+
+				<!-- --- CADASTRO --- -->
+				<div class="tab-pane fade" id="cadastro" role="tabpanel">
+					<form id="formCadastro">
+						<div class="mb-3">
+							<label class="form-label">E-mail</label>
+							<input id="cadEmail" type="email" class="form-control" placeholder="exemplo@email.com" />
+						</div>
+						<div class="mb-3">
+							<label class="form-label">Senha</label>
+							<input id="cadSenha" type="password" class="form-control" placeholder="Mínimo 6 caracteres" />
+						</div>
+						<div class="mb-3">
+							<label class="form-label">Confirmar senha</label>
+							<input id="cadConfirma" type="password" class="form-control" placeholder="Repita sua senha" />
+						</div>
+						<div class="form-check mb-3">
+							<input id="cadTermos" class="form-check-input" type="checkbox" />
+							<label class="form-check-label">Li e concordo com os Termos</label>
+						</div>
+						<div class="d-grid">
+							<button type="button" class="btn btn-success" id="btnCadastrar">Cadastrar</button>
+						</div>
+					</form>
+				</div>
+			</div>
+		</div>
+
+		<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+		<script>
+			const alertBox = document.getElementById("alertBox");
+
+			function showAlert(message, type = "success") {
+				alertBox.innerHTML = `
+          <div class="alert alert-${type} alert-dismissible fade show mt-3" role="alert">
+            ${message}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+          </div>`;
+			}
+
+			// --- LOGIN ---
+			document.getElementById("btnEntrar").addEventListener("click", () => {
+				const email = document.getElementById("loginEmail").value.trim();
+				const senha = document.getElementById("loginSenha").value.trim();
+
+				if (!email || !senha) {
+					showAlert("Por favor, preencha e-mail e senha.", "danger");
+					return;
+				}
+
+				// Simulação de login válido
+				if (email === "usuario@teste.com" && senha === "123456") {
+					showAlert("Login realizado com sucesso! Redirecionando...", "success");
+					setTimeout(() => (window.location.href = "index.html"), 1500);
+				} else {
+					showAlert("E-mail ou senha incorretos.", "danger");
+				}
+			});
+
+			// --- CADASTRO ---
+			document.getElementById("btnCadastrar").addEventListener("click", () => {
+				const email = document.getElementById("cadEmail").value.trim();
+				const senha = document.getElementById("cadSenha").value.trim();
+				const confirma = document.getElementById("cadConfirma").value.trim();
+				const termos = document.getElementById("cadTermos").checked;
+
+				if (!email || !senha || !confirma) {
+					showAlert("Preencha todos os campos obrigatórios.", "danger");
+					return;
+				}
+
+				if (senha.length < 6) {
+					showAlert("A senha deve ter pelo menos 6 caracteres.", "warning");
+					return;
+				}
+
+				if (senha !== confirma) {
+					showAlert("As senhas não coincidem.", "danger");
+					return;
+				}
+
+				if (!termos) {
+					showAlert("Você deve aceitar os Termos para continuar.", "warning");
+					return;
+				}
+
+				showAlert("Cadastro realizado com sucesso! Redirecionando...", "success");
+				setTimeout(() => (window.location.href = "index.html"), 1500);
+			});
+		</script>
+	</body>
+</html>
