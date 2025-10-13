@@ -1,8 +1,11 @@
-package model;
+package app.repositories;
 
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
+
+import app.model.Avaliacao;
+import app.model.DatabaseConnection;
 
 public class AvaliacaoDAO {
 

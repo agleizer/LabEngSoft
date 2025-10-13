@@ -3,7 +3,7 @@
 	<head>
 		<meta charset="UTF-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-		<title>Caminho Fácil – Mapa</title>
+		<title>Caminho Fácil</title>
 
 		<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" />
 		<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
@@ -251,12 +251,12 @@
 
 					const { lat, lon, display_name } = dados[0];
 					if (marcadorBusca) map.removeLayer(marcadorBusca);
-					salvarRuaSelecionada(display_name);
+					salvarRuaSelecionada(rua);
 					ultimaSelecao = "busca"; // <- prioridade para busca
 
 					marcadorBusca = L.marker([lat, lon])
 						.addTo(map)
-						.bindPopup(`<b>${display_name}</b><br><a href="detalhes.html?rua=${encodeURIComponent(display_name)}" onclick="salvarRuaSelecionada('${display_name}')">Ver detalhes</a>`)
+						.bindPopup(`<b>${rua}</b><br><a href="detalhes.html?rua=${encodeURIComponent(rua)}" onclick="salvarRuaSelecionada('${rua}')">Ver detalhes</a>`)
 						.openPopup();
 					map.setView([lat, lon], 17);
 				} catch (e) {

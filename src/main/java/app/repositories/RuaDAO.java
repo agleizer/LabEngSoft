@@ -1,9 +1,15 @@
-package model;
+package app.repositories;
+
+import org.springframework.stereotype.Repository;
+
+import app.model.DatabaseConnection;
+import app.model.Rua;
 
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
+@Repository
 public class RuaDAO {
 
     public void create(Rua rua) throws SQLException {

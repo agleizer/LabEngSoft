@@ -1,0 +1,1 @@
+recriem o .env de vocês com base no .env.example

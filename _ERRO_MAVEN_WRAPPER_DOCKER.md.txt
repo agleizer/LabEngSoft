@@ -1,0 +1,107 @@
+# Como corrigir o erro `./mvnw: not found` ao construir o projeto no Docker
+
+Durante o comando:
+
+```bash
+docker compose build
+````
+
+pode aparecer a seguinte mensagem:
+
+```
+/bin/sh: 1: ./mvnw: not found
+```
+
+ou o build parar na linha:
+
+```
+RUN ./mvnw -B -q -DskipTests ...
+```
+
+### Causa
+
+O Maven Wrapper (`mvnw`) é um pequeno script usado para baixar e executar a versão correta do Maven, mesmo que o Maven **não esteja instalado** na máquina.
+No Windows, esse arquivo às vezes **não é enviado para o Docker** (ou perde a permissão de execução) e, por isso, o container não consegue encontrá-lo.
+
+O problema pode ocorrer quando:
+
+* O repositório foi clonado sem o wrapper (`mvnw` e `.mvn/`);
+* O branch foi criado antes do wrapper existir;
+* As permissões de execução se perderam no Windows;
+* O Docker está sendo executado no Windows via Git Bash e não consegue montar o caminho corretamente.
+
+---
+
+## Soluções
+
+### **Opção 1 – Gerar novamente o Maven Wrapper (recomendado)**
+
+1. Certifique-se de estar na pasta raiz do projeto (`LabEngSoft`).
+
+2. Execute o comando **dentro de um container Maven** (não precisa instalar o Maven localmente):
+
+   **No PowerShell:**
+
+   ```powershell
+   docker run --rm -v "${PWD}:/app" -w /app maven:3.9.11-eclipse-temurin-21 mvn -N io.takari:maven:wrapper
+   ```
+
+   **No Git Bash:**
+
+   ```bash
+   winpty docker run --rm -v "/$(pwd)":/app -w /app maven:3.9.11-eclipse-temurin-21 mvn -N io.takari:maven:wrapper
+   ```
+
+3. Isso criará os seguintes arquivos:
+
+   ```
+   mvnw
+   mvnw.cmd
+   .mvn/wrapper/maven-wrapper.jar
+   .mvn/wrapper/maven-wrapper.properties
+   ```
+
+4. Confirme:
+
+   ```bash
+   ls mvnw .mvn/wrapper
+   ```
+
+5. Comite os arquivos gerados:
+
+   ```bash
+   git add mvnw mvnw.cmd .mvn/
+   git commit -m "Adiciona Maven Wrapper"
+   ```
+
+6. Rode novamente:
+
+   ```bash
+   docker compose build --no-cache
+   docker compose up
+   ```
+
+---
+
+### **Opção 2 – Usar o Maven do container (sem wrapper)**
+
+Se preferir não usar o wrapper, edite o `Dockerfile` e substitua:
+
+```dockerfile
+RUN ./mvnw ...
+```
+
+por:
+
+```dockerfile
+RUN mvn ...
+```
+
+Exemplo:
+
+```dockerfile
+RUN mvn -B -q -DskipTests org.apache.maven.plugins:maven-dependency-plugin:3.6.1:go-offline
+RUN mvn package -DskipTests
+```
+
+Essa opção funciona porque a imagem base `maven:3.9.11-eclipse-temurin-21` já vem com o Maven instalado.

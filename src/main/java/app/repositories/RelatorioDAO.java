@@ -1,8 +1,11 @@
-package model;
+package app.repositories;
 
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
+
+import app.model.DatabaseConnection;
+import app.model.Relatorio;
 
 public class RelatorioDAO {
 
