@@ -53,7 +53,9 @@ git clone https://github.com/<org>/<repo>.git
 cd caminho-facil
 cp .env.example .env
 ## se necessario, rode: sed -i 's/\r$//' mvnw
+docker network create caminhofacil_net (APENAS DA PRIMEIRA VEZ, PARA CRIAR A REDE)
 docker compose up --build
+[NO SERVIDOR, RODAR DETACHED:] docker compose up --build -d
 
 
 O Docker faz tudo:
