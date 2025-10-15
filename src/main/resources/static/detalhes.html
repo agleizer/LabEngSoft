@@ -40,11 +40,6 @@
 				margin-right: 10px;
 			}
 
-			.foto-rua {
-				border-radius: 10px;
-				box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-			}
-
 			.comentario {
 				background: white;
 				border-radius: 10px;
@@ -55,15 +50,6 @@
 
 			.comentario strong {
 				color: #198754;
-			}
-
-			.btn-outline-success {
-				border-radius: 20px;
-			}
-
-			h6 {
-				margin-top: 20px;
-				font-weight: 600;
 			}
 
 			.logoBox {
@@ -86,6 +72,7 @@
 		</style>
 	</head>
 	<link rel="icon" type="image/png" href="assets/img/favicon.png" />
+
 	<body class="bg-light">
 		<!-- Navbar -->
 		<nav class="navbar navbar-dark bg-success fixed-top position-relative">
@@ -94,7 +81,6 @@
 				<span class="navbar-text text-white me-3">Detalhes Calçada</span>
 			</div>
 
-			<!-- Logo placed *below* the navbar, but visually overlapping -->
 			<div class="logoBox position-absolute" style="top: 100%; left: 0; transform: translateY(-40%); z-index: 1">
 				<img class="logoImg" src="assets/img/logoCF.png" alt="Logo Caminho Fácil" />
 			</div>
@@ -134,14 +120,29 @@
 					<div class="progress-bar bg-warning" style="width: 0%"></div>
 				</div>
 
-				<div id="iluminacao" class="criterio"><label>Iluminação adequada</label><span>0%</span></div>
+				<div id="iluminacao" class="criterio"><label>Iluminação noturna</label><span>0%</span></div>
 				<div class="progress mb-2">
 					<div class="progress-bar bg-info" style="width: 0%"></div>
 				</div>
 
 				<div id="livre" class="criterio"><label>Calçada livre de obstáculos</label><span>0%</span></div>
-				<div class="progress">
+				<div class="progress mb-2">
 					<div class="progress-bar bg-danger" style="width: 0%"></div>
+				</div>
+
+				<div id="idoso" class="criterio"><label>Adequada para idosos</label><span>0%</span></div>
+				<div class="progress mb-2">
+					<div class="progress-bar bg-primary" style="width: 0%"></div>
+				</div>
+
+				<div id="cadeirante" class="criterio"><label>Adequada para cadeirantes</label><span>0%</span></div>
+				<div class="progress mb-2">
+					<div class="progress-bar bg-secondary" style="width: 0%"></div>
+				</div>
+
+				<div id="carrinho" class="criterio"><label>Adequada para carrinhos de bebê</label><span>0%</span></div>
+				<div class="progress">
+					<div class="progress-bar bg-dark" style="width: 0%"></div>
 				</div>
 			</div>
 
@@ -157,79 +158,76 @@
 		<script>
 			document.addEventListener("DOMContentLoaded", async () => {
 				const params = new URLSearchParams(window.location.search);
-				const rua = params.get("rua");
+				const ruaParam = params.get("rua"); // vem de detalhes.html?rua=...
+				const ruaDec = ruaParam ? decodeURIComponent(ruaParam) : null;
+
 				const titulo = document.getElementById("titulo-rua");
 				const btnRota = document.getElementById("btnRota");
 
-				if (rua) titulo.textContent = decodeURIComponent(rua);
-				else titulo.textContent = "Rua não informada";
+				// 1) Título e fallback de localStorage imediatamente
+				titulo.textContent = ruaDec || "Rua não informada";
+				if (ruaDec) localStorage.setItem("ruaSelecionada", ruaDec);
+
+				// 2) Botão de rota SEMPRE funcional (independente das APIs)
+				btnRota.addEventListener("click", () => {
+					const destino = ruaDec ? `rotas.html?rua=${encodeURIComponent(ruaDec)}` : "rotas.html";
+					window.location.href = destino;
+				});
 
 				try {
-					// 1️⃣ Buscar calçada correspondente à rua
-					const respCalc = await fetch(`/api/calcadas?rua=${encodeURIComponent(rua)}`);
-					if (!respCalc.ok) throw new Error("Erro ao buscar calçadas");
-					const calcadas = await respCalc.json();
-					if (!calcadas.length) throw new Error("Nenhuma calçada encontrada");
+					// 3) Busca calçada (se falhar, seguimos com o fallback acima)
+					const respCalc = await fetch(`/api/calcadas?rua=${encodeURIComponent(ruaDec || "")}`);
+					if (respCalc.ok) {
+						const calcadas = await respCalc.json();
+						if (Array.isArray(calcadas) && calcadas.length > 0) {
+							const c = calcadas[0];
 
-					const calcadaId = calcadas[0].id;
+							// salva coordenadas quando disponíveis (rotas.html pode usar)
+							if (c.nome_rua) localStorage.setItem("ruaSelecionada", c.nome_rua);
+							if (c.latitude_ini != null) localStorage.setItem("latIni", c.latitude_ini);
+							if (c.longitude_ini != null) localStorage.setItem("lonIni", c.longitude_ini);
+							if (c.latitude_fim != null) localStorage.setItem("latFim", c.latitude_fim);
+							if (c.longitude_fim != null) localStorage.setItem("lonFim", c.longitude_fim);
 
-					// 2️⃣ Buscar resumo de avaliações
-					const respResumo = await fetch(`/api/avaliacoes/resumo?calcadaId=${calcadaId}`);
-					if (!respResumo.ok) throw new Error("Erro ao buscar resumo");
-					const resumo = await respResumo.json();
+							// 4) Busca resumo (pode não existir; não dá throw)
+							const respResumo = await fetch(`/api/avaliacoes/resumo?calcadaId=${c.id}`);
+							if (respResumo.ok) {
+								const resumo = (await respResumo.json()) || {};
 
-					// Se não houver avaliações, exibe mensagem sutil
-					if (!resumo || Object.keys(resumo).length === 0) {
-						document.querySelector("#valor-media").textContent = "(N/A)";
-						document.querySelector("#comentarios").innerHTML = "<h6 class='text-success'>Comentários</h6><p class='text-muted'>Nenhum dado cadastrado para esta rua.</p>";
-						return;
-					}
+								// Avaliação média + estrelas
+								const media = resumo.mediaGeral || 0;
+								document.getElementById("valor-media").textContent = `(${media > 0 ? media.toFixed(1) : "N/A"})`;
+								const stars = Math.floor(media);
+								document.getElementById("stars").textContent = "★★★★★".slice(0, stars) + "☆☆☆☆☆".slice(0, 5 - stars);
 
-					// 3️⃣ Avaliação média e estrelas
-					const valorMedia = document.getElementById("valor-media");
-					const starsContainer = document.getElementById("stars");
-					const media = resumo.mediaGeral || 0;
-					valorMedia.textContent = `(${media > 0 ? media.toFixed(1) : "N/A"})`;
+								// Barras de características
+								const setProgress = (id, valor = 0) => {
+									const bar = document.querySelector(`#${id} + .progress .progress-bar`);
+									const label = document.querySelector(`#${id} span`);
+									if (bar && label) {
+										bar.style.width = `${valor}%`;
+										label.textContent = `${valor}%`;
+									}
+								};
+								setProgress("piso", resumo.pisoTatil || 0);
+								setProgress("rebaixamento", resumo.rebaixamentoGuia || 0);
+								setProgress("iluminacao", resumo.iluminacaoNoturna || 0);
+								setProgress("livre", resumo.semObstaculos || 0);
+								setProgress("idoso", resumo.idoso || 0);
+								setProgress("cadeirante", resumo.cadeirante || 0);
+								setProgress("carrinho", resumo.carrinho || 0);
 
-					const fullStars = Math.floor(media);
-					const halfStar = media % 1 >= 0.5;
-					let starsHTML = "";
-					for (let i = 0; i < 5; i++) {
-						if (i < fullStars) starsHTML += "★";
-						else if (i === fullStars && halfStar) starsHTML += "☆";
-						else starsHTML += "☆";
-					}
-					starsContainer.textContent = starsHTML;
-
-					// 4️⃣ Percentuais
-					const setProgress = (id, valor) => {
-						const bar = document.querySelector(`#${id} + .progress .progress-bar`);
-						const label = document.querySelector(`#${id} span`);
-						if (bar && label) {
-							bar.style.width = valor + "%";
-							label.textContent = valor + "%";
+								// Comentários
+								const comentariosDiv = document.getElementById("comentarios");
+								const comentarios = Array.isArray(resumo.comentarios) ? resumo.comentarios : [];
+								comentariosDiv.innerHTML =
+									"<h6 class='text-success'>Comentários</h6>" + (comentarios.length ? comentarios.map((c) => `<div class="comentario"><strong>Usuário:</strong> ${c}</div>`).join("") : "<p class='text-muted'>Nenhum comentário ainda.</p>");
+							}
 						}
-					};
-
-					setProgress("piso", resumo.pisoTatil || 0);
-					setProgress("rebaixamento", resumo.rebaixamentoGuia || 0);
-					setProgress("iluminacao", resumo.iluminacaoNoturna || 0);
-					setProgress("livre", resumo.semObstaculos || 0);
-
-					// 5️⃣ Comentários
-					const comentariosDiv = document.getElementById("comentarios");
-					if (resumo.comentarios && resumo.comentarios.length > 0) {
-						comentariosDiv.innerHTML = "<h6 class='text-success'>Comentários</h6>" + resumo.comentarios.map((c) => `<div class="comentario"><strong>Usuário:</strong> ${c}</div>`).join("");
-					} else {
-						comentariosDiv.innerHTML = "<h6 class='text-success'>Comentários</h6><p class='text-muted'>Nenhum comentário ainda.</p>";
 					}
-
-					// 6️⃣ Botão "Traçar rota"
-					btnRota.addEventListener("click", () => {
-						window.location.href = `rotas.html?rua=${encodeURIComponent(rua)}`;
-					});
+					// Se qualquer etapa acima falhar, seguimos com N/A e o botão já está funcional
 				} catch (err) {
-					console.warn("Aviso:", err.message);
+					console.warn("Aviso:", err?.message || err);
 					document.querySelector("#valor-media").textContent = "(N/A)";
 					document.querySelector("#comentarios").innerHTML = "<h6 class='text-success'>Comentários</h6><p class='text-muted'>Nenhum dado cadastrado para esta rua.</p>";
 				}
