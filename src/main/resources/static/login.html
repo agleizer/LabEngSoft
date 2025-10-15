@@ -1,5 +1,24 @@
 <!DOCTYPE html>
 <html lang="pt-br">
+	<style>
+		.logoBox {
+			background-color: white;
+			border-radius: 0 8px 8px 0;
+			padding: 5px 10px;
+			box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+			display: inline-block;
+			}
+
+			.logoImg {
+			height: 70px;
+			display: block;
+			}
+
+			.navbar {
+			padding-top: 0.5rem;
+			padding-bottom: 0.5rem;
+			}
+	</style>
 	<head>
 		<meta charset="UTF-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -8,10 +27,15 @@
 	</head>
 
 	<body class="bg-light">
-		<nav class="navbar navbar-dark bg-success fixed-top">
-			<div class="container-fluid">
-				<a class="navbar-brand" href="index.html">← Voltar</a>
-				<span class="navbar-text text-white">Acesso do Usuário</span>
+		<nav class="navbar navbar-dark bg-success fixed-top position-relative">
+			<div class="container-fluid d-flex align-items-center justify-content-between">
+				<a class="navbar-brand text-white ms-5" href="detalhes.html" style="padding-left: 100px;">← Voltar</a>
+				<span class="navbar-text text-white me-3">Avaliar Calçada</span>
+			</div>
+
+			<!-- Logo placed *below* the navbar, but visually overlapping -->
+			<div class="logoBox position-absolute" style="top: 100%; left: 0; transform: translateY(-40%); z-index: 1;">
+				<img class="logoImg" src="assets/img/logoCF.png" alt="Logo Caminho Fácil">
 			</div>
 		</nav>
 
