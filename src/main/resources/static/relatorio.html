@@ -139,6 +139,14 @@
 					top: 140px; /* empurra os botões + e - para baixo */
 				}
 			}
+
+			#botaoBusca:hover{
+				background-color: #5bce98;
+			}
+
+			#botaoBusca:active{
+				background-color: #0b3723;
+			}
 		</style>
 	</head>
 
@@ -148,7 +156,9 @@
 		<!-- Caixa de busca -->
 		<div class="search-box">
 			<input type="text" id="campoBusca" placeholder="Buscar endereço..." aria-label="Buscar endereço" />
-			<button id="botaoBusca">🔍</button>
+			<button id="botaoBusca">
+				<img src="assets/img/lupa.png" style="width: 15px; padding-bottom: 3px;">
+			</button>
 		</div>
 
 		<!-- Ícones superiores -->
@@ -172,7 +182,10 @@
 		</div>
 
 		<!-- Botão gerar relatório -->
-		<button id="btnRelatorio" class="btn btn-primary btn-lg">📥 Gerar Relatório</button>
+		<button id="btnRelatorio" class="btn btn-primary btn-lg">
+			<img src="assets/img/download.png" style="width: 15px; padding-bottom: 3px; display: inline-block">
+			Gerar Relatório
+		</button>
 
 		<!-- Modal de sucesso -->
 		<div class="modal fade" id="modalSucesso" tabindex="-1" aria-labelledby="modalSucessoLabel" aria-hidden="true">

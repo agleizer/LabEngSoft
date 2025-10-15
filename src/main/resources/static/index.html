@@ -136,6 +136,14 @@
 				transform: translateX(-50%);
 				z-index: 1000;
 			}
+
+			#botaoBusca:hover{
+				background-color: #5bce98;
+			}
+
+			#botaoBusca:active{
+				background-color: #0b3723;
+			}
 		</style>
 	</head>
 
@@ -145,7 +153,9 @@
 		<!-- Caixa de busca -->
 		<div class="search-box">
 			<input type="text" id="campoBusca" placeholder="Buscar rua..." aria-label="Buscar rua" />
-			<button id="botaoBusca">🔍</button>
+			<button id="botaoBusca">
+				<img src="assets/img/lupa.png" style="width: 15px; padding-bottom: 3px;">
+			</button>
 		</div>
 
 		<!-- Ícones no topo -->
