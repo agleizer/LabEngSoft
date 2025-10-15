@@ -195,25 +195,58 @@
 				});
 			});
 
-			// validação e envio
-			form.addEventListener("submit", (e) => {
+			// envio real da avaliação
+			form.addEventListener("submit", async (e) => {
 				e.preventDefault();
 				alertErro.style.display = "none";
 				alertSucesso.style.display = "none";
 
 				const nota = parseInt(notaInput.value);
 				const comentario = document.getElementById("comentario").value.trim();
+				const rua = localStorage.getItem("ruaSelecionada") || "Desconhecida";
 
 				if (!nota || !comentario) {
 					alertErro.style.display = "block";
 					return;
 				}
 
-				// simula envio
-				setTimeout(() => {
+				// coleta completa — incluindo coordenadas salvas no localStorage
+				const dados = {
+					rua,
+					notaGeral: nota,
+					notaCadeirante: document.getElementById("cadeirante").checked ? 5 : 3,
+					notaCarrinho: document.getElementById("bebe").checked ? 5 : 3,
+					notaIdoso: document.getElementById("idosos").checked ? 5 : 3,
+					notaCego: document.getElementById("tatil").checked ? 5 : 3,
+					presencaPisoTatil: document.getElementById("tatil").checked,
+					rebaixamentoGuia: document.getElementById("rebaixamento").checked,
+					semObstaculos: document.getElementById("obstaculos").checked,
+					iluminacaoNoturna: document.getElementById("iluminacao").checked,
+					comentario: comentario,
+					latitudeIni: parseFloat(localStorage.getItem("latIni")) || 0,
+					longitudeIni: parseFloat(localStorage.getItem("lonIni")) || 0,
+					latitudeFim: parseFloat(localStorage.getItem("latFim")) || 0,
+					longitudeFim: parseFloat(localStorage.getItem("lonFim")) || 0,
+				};
+
+				try {
+					const resp = await fetch("http://localhost:8080/api/avaliacoes", {
+						method: "POST",
+						headers: { "Content-Type": "application/json" },
+						body: JSON.stringify(dados),
+					});
+
+					if (!resp.ok) throw new Error("Falha no envio");
 					alertSucesso.style.display = "block";
 					window.scrollTo({ top: 0, behavior: "smooth" });
-				}, 400);
+					form.reset();
+					stars.forEach((s) => s.classList.remove("active"));
+					notaInput.value = 0;
+				} catch (err) {
+					console.error(err);
+					alertErro.textContent = "❌ Erro ao enviar avaliação. Tente novamente.";
+					alertErro.style.display = "block";
+				}
 			});
 		</script>
 	</body>
