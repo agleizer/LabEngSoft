@@ -5,6 +5,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+    container_name: caminhofacil_app
     ports:
       - "8080:8080"
     env_file:
@@ -12,9 +13,13 @@ services:
     depends_on:
       db:
         condition: service_healthy
+    networks:
+      - caminhofacil_net
+    restart: unless-stopped
 
   db:
     image: postgres:17
+    container_name: caminhofacil_db
     environment:
       POSTGRES_DB: ${POSTGRES_DB:-caminhofacil}
       POSTGRES_USER: ${POSTGRES_USER:-postgres}
@@ -28,6 +33,13 @@ services:
       interval: 5s
       timeout: 5s
       retries: 10
+    networks:
+      - caminhofacil_net
+    restart: unless-stopped
 
 volumes:
   pgdata:
+
+networks:
+  caminhofacil_net:
+    external: true

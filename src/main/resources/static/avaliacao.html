@@ -50,7 +50,7 @@
 			}
 
 			.logoImg {
-				height: 70px;
+				height: 50px;
 				display: block;
 			}
 
@@ -230,7 +230,7 @@
 				};
 
 				try {
-					const resp = await fetch("http://localhost:8080/api/avaliacoes", {
+					const resp = await fetch("/api/avaliacoes", {
 						method: "POST",
 						headers: { "Content-Type": "application/json" },
 						body: JSON.stringify(dados),
