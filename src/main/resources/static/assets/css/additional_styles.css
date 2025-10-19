@@ -1,0 +1,12 @@
+#botao_voltar{
+				border: white solid;
+				border-radius: 5px;
+				padding-left: 10px !important;
+				padding-right: 10px;
+				margin-left: 70px !important;
+			}
+
+
+#botao_voltar:hover{
+    background-color: rgb(42, 71, 42);
+}
