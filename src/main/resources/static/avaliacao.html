@@ -90,6 +90,9 @@
 			<form id="avaliacaoForm">
 				<!-- Estrelas -->
 				<div class="mb-4 text-center">
+					<div class="mb-2">
+						<div id="rating-label" class="star-rating-text">Escolha uma nota</div>
+					</div>
 					<div id="stars" class="star-rating">
 						<span class="star" data-value="1">★</span>
 						<span class="star" data-value="2">★</span>
@@ -204,6 +207,9 @@
 			const form = document.getElementById("avaliacaoForm");
 
 			// controle de estrelas
+			const ratingLabel = document.getElementById("rating-label");
+			const labels = ["Péssimo", "Ruim", "Regular", "Bom", "Excelente"];
+
 			stars.forEach((star) => {
 				star.addEventListener("click", () => {
 					const value = parseInt(star.dataset.value);
@@ -211,6 +217,7 @@
 					stars.forEach((s) => {
 						s.classList.toggle("active", parseInt(s.dataset.value) <= value);
 					});
+					ratingLabel.textContent = labels[value - 1];
 				});
 			});
 
