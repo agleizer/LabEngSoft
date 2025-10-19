@@ -117,3 +117,11 @@
 	min-height: 1.5em;
 	transition: color 0.2s ease;
 }
+
+#botao_enviar_avaliacao{
+    background-color: #198754 !important;
+}
+
+#botao_enviar_avaliacao:hover{
+    background-color: #146c43 !important;
+}
