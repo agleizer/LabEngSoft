@@ -36,3 +36,11 @@
 .icone_titulo{
     height: 30px;
 }
+
+#btnRota{
+    background-color: #198754 !important;
+}
+
+#btnRota:hover{
+    background-color: #146c43 !important;
+}
