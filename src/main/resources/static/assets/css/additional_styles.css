@@ -44,3 +44,17 @@
 #btnRota:hover{
     background-color: #146c43 !important;
 }
+
+#opcao_acess{
+    font-weight: normal;
+}
+
+.form-check-input:checked {
+  background-color: #198754 !important; /* your desired color */
+  border-color: #146c43 !important;
+}
+
+.form-check-input:focus {
+  box-shadow: 0 0 0 0.25rem rgba(25, 135, 84, 0.25);
+  border-color: #198754;
+}
