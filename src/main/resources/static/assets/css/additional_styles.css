@@ -10,3 +10,29 @@
 #botao_voltar:hover{
     background-color: rgb(42, 71, 42);
 }
+
+.funcionalidade_titulo{
+    margin: 50px 10px 5px 5%;
+    margin-bottom: 0px;
+}
+
+.hr_style{
+    margin-left: 5%;
+    margin-right: 5%;
+}
+
+#dados-rua{
+    margin-top: 10px !important;
+}
+
+#avaliacao_box{
+    margin-top: 10px !important;
+}
+
+#login_box{
+    margin-top: 10px !important;
+}
+
+.icone_titulo{
+    height: 30px;
+}
