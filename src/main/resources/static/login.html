@@ -25,31 +25,43 @@
 		<title>Caminho Fácil - Login</title>
 		<link rel="icon" type="image/png" href="assets/img/favicon.png" />
 		<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
+		<link rel="stylesheet" href="assets/css/additional_styles.css">
 	</head>
 
 	<body class="bg-light">
 		<nav class="navbar navbar-dark bg-success fixed-top position-relative">
 			<div class="container-fluid d-flex align-items-center justify-content-between">
-				<a class="navbar-brand text-white ms-5" href="index.html" style="padding-left: 50px">← Voltar</a>
+				<a class="navbar-brand text-white ms-5" href="index.html" id="btnVoltar">← Voltar</a>
 				<span class="navbar-text text-white me-3">Login</span>
 			</div>
 
 			<!-- Logo placed *below* the navbar, but visually overlapping -->
-			<div class="logoBox position-absolute" style="top: 100%; left: 0; transform: translateY(-40%); z-index: 1">
-				<img class="logoImg" src="assets/img/logoCF.png" alt="Logo Caminho Fácil" />
-			</div>
+			<a href="index.html">
+				<div class="logoBox position-absolute" style="top: 100%; left: 0; transform: translateY(-40%); z-index: 1">
+					<img class="logoImg" src="assets/img/logoCF.png" alt="Logo Caminho Fácil" />
+				</div>
+			</a>
 		</nav>
 
-		<div class="container mt-5 pt-4">
+		<h3 class="funcionalidade_titulo">
+			<img src="assets/img/login.png" class="icone_titulo">
+			Login
+			<button type="button" class="btn btn-outline-info btn-sm" data-bs-toggle="tooltip" data-bs-placement="right" 
+					title="Login de usuário usando seus credenciais." id="info_button">i
+			</button>
+		</h3>
+		<hr class="hr_style">
+
+		<div class="container mt-5 pt-4" id="login_box">
 			<!-- Área de mensagens -->
 			<div id="alertBox"></div>
 
 			<ul class="nav nav-tabs" id="myTab" role="tablist">
 				<li class="nav-item" role="presentation">
-					<button class="nav-link active" id="login-tab" data-bs-toggle="tab" data-bs-target="#login" type="button" role="tab">Login</button>
+					<button class="nav-link active" id="login-tab" data-bs-toggle="tab" data-bs-target="#login" type="button" role="tab" style="color: #198754;">Login</button>
 				</li>
 				<li class="nav-item" role="presentation">
-					<button class="nav-link" id="cadastro-tab" data-bs-toggle="tab" data-bs-target="#cadastro" type="button" role="tab">Cadastro</button>
+					<button class="nav-link" id="cadastro-tab" data-bs-toggle="tab" data-bs-target="#cadastro" type="button" role="tab" style="color: #198754;">Cadastro</button>
 				</li>
 			</ul>
 

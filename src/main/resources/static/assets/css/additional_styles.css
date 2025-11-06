@@ -1,0 +1,127 @@
+#btnVoltar{
+				border: white solid;
+				border-radius: 5px;
+				padding-left: 10px !important;
+				padding-right: 10px;
+				margin-left: 70px !important;
+			}
+
+
+#btnVoltar:hover{
+    background-color: rgb(42, 71, 42);
+}
+
+.funcionalidade_titulo{
+    margin: 50px 10px 5px 5%;
+    margin-bottom: 0px;
+}
+
+.hr_style{
+    margin-left: 5%;
+    margin-right: 5%;
+}
+
+#dados-rua{
+    margin-top: 10px !important;
+}
+
+#avaliacao_box{
+    margin-top: 10px !important;
+}
+
+#login_box{
+    margin-top: 10px !important;
+}
+
+.icone_titulo{
+    height: 30px;
+}
+
+#btnRota{
+    background-color: #198754 !important;
+}
+
+#btnRota:hover{
+    background-color: #146c43 !important;
+}
+
+#opcao_acess{
+    font-weight: normal;
+}
+
+.form-check-input:checked {
+  background-color: #198754 !important; /* your desired color */
+  border-color: #146c43 !important;
+}
+
+.form-check-input:focus {
+  box-shadow: 0 0 0 0.25rem rgba(25, 135, 84, 0.25);
+  border-color: #198754;
+}
+
+#botaoDetalhes{
+    background-color: #198754 !important;
+}
+
+#botaoDetalhes:hover{
+    background-color: #146c43 !important;
+}
+
+#btnRelatorio{
+    background-color: #198754 !important;
+}
+
+#btnRelatorio:hover{
+    background-color: #146c43 !important;
+}
+
+#btnRota{
+    color: white !important;
+}
+
+#info_button {
+  margin-left: 6px;
+  border-radius: 50%;
+  height: 21px;
+  width: 20px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px; /* tweak if needed */
+  border: 1px solid #198754;
+  color: #198754;
+  background: transparent;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+}
+
+#info_button:hover {
+  background: #198754;
+  color: white;
+}
+
+#btnEntrar{
+    background: #198754 !important;
+}
+
+#btnEntrar:hover{
+    background-color: #146c43 !important;
+}
+
+.star-rating-text {
+	font-size: 1rem;
+	font-weight: 500;
+	margin-bottom: 5px;
+	color: #555;
+	text-align: center;
+	min-height: 1.5em;
+	transition: color 0.2s ease;
+}
+
+#botao_enviar_avaliacao{
+    background-color: #198754 !important;
+}
+
+#botao_enviar_avaliacao:hover{
+    background-color: #146c43 !important;
+}

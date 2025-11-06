@@ -6,6 +6,7 @@
 		<title>Caminho Fácil - Avaliação</title>
 
 		<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
+		<link rel="stylesheet" href="assets/css/additional_styles.css">
 
 		<style>
 			body {
@@ -66,20 +67,34 @@
 	<body>
 		<nav class="navbar navbar-dark bg-success fixed-top position-relative">
 			<div class="container-fluid d-flex align-items-center justify-content-between">
-				<a id="btnVoltar" class="navbar-brand text-white ms-5" href="#" style="padding-left: 50px">← Voltar</a>
+				<a class="navbar-brand text-white ms-5" href="#" style="padding-left: 50px" id="btnVoltar">← Voltar</a>
 				<span class="navbar-text text-white me-3">Avaliar Calçada</span>
 			</div>
 
 			<!-- Logo placed *below* the navbar, but visually overlapping -->
-			<div class="logoBox position-absolute" style="top: 100%; left: 0; transform: translateY(-40%); z-index: 1">
-				<img class="logoImg" src="assets/img/logoCF.png" alt="Logo Caminho Fácil" />
-			</div>
+			<a href="index.html">
+				<div class="logoBox position-absolute" style="top: 100%; left: 0; transform: translateY(-40%); z-index: 1">
+					<img class="logoImg" src="assets/img/logoCF.png" alt="Logo Caminho Fácil" />
+				</div>
+			</a>
 		</nav>
 
-		<div class="container mt-5 pt-4">
+		<h3 class="funcionalidade_titulo">
+			<img src="assets/img/avaliar.png" class="icone_titulo">
+			Avaliação
+			<button type="button" class="btn btn-outline-info btn-sm" data-bs-toggle="tooltip" data-bs-placement="right" 
+			title="Avaliação da calçada selecionada. Em estrelas, com comentário e upload de imagens." id="info_button">i
+			</button>
+		</h3>
+		<hr class="hr_style">
+
+		<div class="container mt-5 pt-4" id="avaliacao_box">
 			<form id="avaliacaoForm">
 				<!-- Estrelas -->
 				<div class="mb-4 text-center">
+					<div class="mb-2">
+						<div id="rating-label" class="star-rating-text">Escolha uma nota</div>
+					</div>
 					<div id="stars" class="star-rating">
 						<span class="star" data-value="1">★</span>
 						<span class="star" data-value="2">★</span>
@@ -93,12 +108,18 @@
 				<!-- Comentário -->
 				<div class="mb-3">
 					<label class="form-label fw-bold">Comentário</label>
+					<button type="button" class="btn btn-outline-info btn-sm" data-bs-toggle="tooltip" data-bs-placement="right" 
+					title="Descreva informações que julgue como pertinentes para a calçada que está avaliando." id="info_button">i
+					</button>
 					<textarea id="comentario" class="form-control" rows="3" placeholder="Escreva aqui seu comentário..."></textarea>
 				</div>
 
 				<!-- Detalhes -->
 				<div class="mb-4">
 					<label class="form-label fw-bold">Detalhes</label>
+					<button type="button" class="btn btn-outline-info btn-sm" data-bs-toggle="tooltip" data-bs-placement="right" 
+					title="Detalhes de acessabilidade gerais para marcar se são atendidos pela calçada ou não." id="info_button">i
+					</button>
 
 					<div class="form-switch">
 						<label for="cadeirante">Adequado para cadeira de rodas?</label>
@@ -139,6 +160,9 @@
 				<!-- Foto -->
 				<div class="mb-3">
 					<label class="form-label fw-bold">Foto (opcional)</label>
+					<button type="button" class="btn btn-outline-info btn-sm" data-bs-toggle="tooltip" data-bs-placement="right" 
+					title="Upload de foto da calçada sendo avaliada. Recomenda-se postar foto do problema localizado." id="info_button">i
+					</button>
 					<input type="file" class="form-control" id="foto" />
 				</div>
 
@@ -151,7 +175,7 @@
 
 				<!-- Botão Enviar -->
 				<div class="d-grid mt-4">
-					<button type="submit" class="btn btn-primary">Enviar avaliação</button>
+					<button type="submit" class="btn btn-primary" id="botao_enviar_avaliacao">Enviar avaliação</button>
 				</div>
 			</form>
 		</div>
@@ -185,6 +209,9 @@
 			const form = document.getElementById("avaliacaoForm");
 
 			// controle de estrelas
+			const ratingLabel = document.getElementById("rating-label");
+			const labels = ["Péssimo", "Ruim", "Regular", "Bom", "Excelente"];
+
 			stars.forEach((star) => {
 				star.addEventListener("click", () => {
 					const value = parseInt(star.dataset.value);
@@ -192,6 +219,7 @@
 					stars.forEach((s) => {
 						s.classList.toggle("active", parseInt(s.dataset.value) <= value);
 					});
+					ratingLabel.textContent = labels[value - 1];
 				});
 			});
 
