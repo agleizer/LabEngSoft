@@ -1,7 +1,9 @@
 <div align="center">
   <img src="src/main/resources/static/assets/img/logoCF.png" alt="Caminho Fácil Logo" height="150"/>
   <p></p>
-  <img src="https://img.shields.io/badge/python-3.10-blue" alt="Python 3.10" height="18"/>
+  <img src="https://img.shields.io/badge/java-21-red" alt="Java 21" height="18"/>
+  <img src="https://img.shields.io/badge/spring%20boot-3.3-green" alt="Spring Boot 3" height="18"/>
+  <img src="https://img.shields.io/badge/postgresql-15-blue" alt="PostgreSQL 15" height="18"/>
   <img src="https://img.shields.io/badge/docker-compose%20ready-brightgreen" alt="Docker Compose Ready" height="18"/>
   <img src="https://img.shields.io/badge/student%20project-yes-lightgrey" alt="Student Project" height="18"/>
   <img src="https://img.shields.io/badge/status-work%20in%20progress-yellow" alt="Status WIP" height="18"/>
