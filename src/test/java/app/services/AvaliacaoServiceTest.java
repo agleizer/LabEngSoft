@@ -20,13 +20,13 @@ import static org.junit.jupiter.api.Assertions.*;
 class AvaliacaoServiceTest {
 
     @Mock
-    private AvaliacaoRepository repository;
+    AvaliacaoRepository repository;
 
     @Mock
-    private JdbcTemplate jdbc;
+    JdbcTemplate jdbc;
 
     @InjectMocks
-    private AvaliacaoService service;
+    AvaliacaoService service;
 
     @Test
     void deveListarTodasAvaliacoes() {
@@ -43,8 +43,7 @@ class AvaliacaoServiceTest {
     void deveLancarExcecaoQuandoRuaForNula() {
         Map<String, Object> dados = Map.of();
 
-        var ex = assertThrows(IllegalArgumentException.class,
-                () -> service.salvar(dados));
+        var ex = assertThrows(IllegalArgumentException.class, () -> service.salvar(dados));
 
         assertEquals("Nome da rua é obrigatório.", ex.getMessage());
         verifyNoInteractions(repository);
@@ -52,10 +51,7 @@ class AvaliacaoServiceTest {
 
     @Test
     void deveSalvarAvaliacaoQuandoRuaExistente() {
-        Map<String, Object> dados = Map.of(
-                "rua", "Paulista",
-                "notaGeral", 5
-        );
+        Map<String, Object> dados = Map.of("rua", "Paulista", "notaGeral", 5);
 
         when(jdbc.query(
                 anyString(),
@@ -70,5 +66,4 @@ class AvaliacaoServiceTest {
         verify(repository, times(1)).save(any(Avaliacao.class));
         verify(jdbc, atLeastOnce()).update(anyString(), any(Object[].class));
     }
-
 }
