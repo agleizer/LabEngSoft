@@ -4,6 +4,8 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Profile;
+
 
 import app.model.Rua;
 import app.model.Calcada;
@@ -15,6 +17,8 @@ import app.repositories.AvaliacaoDAO;
 import java.util.List;
 import java.time.LocalDate;
 
+
+
 @SpringBootApplication
 public class Main {
     public static void main(String[] args) {
@@ -22,6 +26,7 @@ public class Main {
     }
 
     @Bean
+    @Profile("!test")
     public CommandLineRunner demo(RuaDAO ruaDAO) {
         return (args) -> {
             Rua rua = new Rua("Rua das Flores", "Centro");
