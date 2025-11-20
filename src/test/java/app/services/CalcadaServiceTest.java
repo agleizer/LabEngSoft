@@ -147,4 +147,15 @@ class CalcadasServiceTest {
         assertEquals(40.5, dto.longitude_fim());
         assertEquals(8.25, dto.avaliacao_media());
     }
+
+    @Test
+    void deveRetornarListaVaziaQuandoNaoExistirNada() {
+        when(repo.buscarPorRua("nada")).thenReturn(List.of());
+
+        List<CalcadaDTO> saida = service.buscarPorRua("nada");
+
+        assertNotNull(saida);
+        assertTrue(saida.isEmpty());
+        verify(repo).buscarPorRua("nada");
+    }
 }
