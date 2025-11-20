@@ -34,7 +34,7 @@ O sistema permite:
 
 - Avaliar calçadas (nota, fotos, comentários, itens de acessibilidade)
 - Consultar avaliações existentes diretamente no mapa
-- Gerar relatórios sobre condições e acessibilidade por região (ponto + raio) [func. ainda sem intergação com o banco de dados]
+- Gerar relatórios sobre condições e acessibilidade por região (ponto + raio)
 
 ---
 
@@ -54,7 +54,7 @@ O sistema permite:
     - Foto opcional
     - Itens de acessibilidade (cadeira de rodas, carrinho de bebê, piso tátil, largura adequada, etc.)
 
-- **Gerar relatório** [funcionalidade incompleta, sem integração com o BD]
+- **Gerar relatório** [em desenvolvimento]
   - Seleção de uma área (ponto + raio)
   - Consolidação das calçadas avaliadas na região
   - Estatísticas de notas e problemas mais frequentes
@@ -200,7 +200,7 @@ Esta seção descreve, em linguagem mais próxima do usuário final, como utiliz
 
 A documentação detalhada do projeto (capítulos 1 a 9: introdução, definição da demanda, requisitos, protótipos, modelagem, arquitetura, desenvolvimento, resultados e conclusão) está disponível em:
 
-Wiki do Projeto[https://github.com/agleizer/LabEngSoft/wiki]
+[Wiki do Projeto](https://github.com/agleizer/LabEngSoft/wiki)
 
 ---
 
